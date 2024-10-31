@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"path": "stick-together",
+			"problemMatcher": [],
+			"label": "npm: dev - stick-together",
+			"detail": "vite"
+		}
+	]
+}
