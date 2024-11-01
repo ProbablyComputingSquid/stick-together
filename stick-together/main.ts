@@ -43,8 +43,8 @@ const LEVELS = [
     [
         "                                             $$$     $         ",
         "                                            =====              ",
-        "                            ^                                  ",
-        "                        ^   =        =   =                  >  ",
+        "                                                               ",
+        "                        ^   ^        =   =                  >  ",
         "O@    $   $     ^       =$$$=                $$$    ^^^     =  ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
@@ -86,7 +86,7 @@ scene("game", ({ levelId, coins }) => {
         tiles: {
             "@": () => [
                 sprite("bean"),
-                area(),
+                area({scale:0.75}),
                 body({jumpForce:700}),
                 anchor("center"),
 				pos(),
@@ -100,7 +100,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "O": () => [
                 sprite("bean"),
-                area(),
+                area({scale:0.75}),
                 body({jumpForce:700}),
                 anchor("center"),
 				pos(),
