@@ -9,6 +9,7 @@
 		"check": "tsc"
 	},
 	"dependencies": {
+		"esbuild": "^0.24.0",
 		"kaplay": "^3001.0.0-beta.8"
 	},
 	"devDependencies": {

@@ -7,7 +7,7 @@ import "kaplay/global";
 kaplay();
 
 // Load assets
-loadSprite("bean", "/sprites/bean.png");
+loadSprite("bean", " /sprites/bean.png");
 loadSprite("coin", "/sprites/coin.png");
 loadSprite("spike", "/sprites/spike.png");
 loadSprite("grass", "/sprites/grass.png");
