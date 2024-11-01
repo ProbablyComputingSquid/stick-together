@@ -43,8 +43,8 @@ const LEVELS = [
     [
         "                                             $$$     $         ",
         "                                            =====              ",
-        "                            ^                                  ",
-        "                        ^   =        =   =                  >  ",
+        "                                                               ",
+        "                        ^   ^        =   =                  >  ",
         "O@    $   $     ^       =$$$=                $$$    ^^^     =  ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
@@ -86,7 +86,9 @@ scene("game", ({ levelId, coins }) => {
         tiles: {
             "@": () => [
                 sprite("bean"),
-                area(),
+                area({
+                        scale:0.7
+                    }),
                 body({jumpForce:700}),
                 anchor("center"),
 				pos(),
@@ -100,7 +102,11 @@ scene("game", ({ levelId, coins }) => {
             ],
             "O": () => [
                 sprite("bean"),
-                area(),
+                area(
+                    {
+                        scale:0.7
+                    }
+                ),
                 body({jumpForce:700}),
                 anchor("center"),
 				pos(),
@@ -334,13 +340,12 @@ scene("lose", () => {
 scene("win", ({ coins }) => {
     add([
         text(`You won!\nYou grabbed ${coins} out of ${totalCoins}coins!!!`, {
-            width: width(),
+            width: width()
         }),
         scale(3),
-        color(WHITE),
-        outline(12, BLACK),
+        color(BLACK),
         pos(width()/2, height()/2 - height()/4),
-        anchor("center",)
+        anchor("center"),
     ]);
     onKeyPress(start);
 });
