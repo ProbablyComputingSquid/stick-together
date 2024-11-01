@@ -13,39 +13,50 @@ loadSprite("spike", "/sprites/spike.png");
 loadSprite("grass", "/sprites/grass.png");
 loadSprite("ghosty", "/sprites/ghosty.png");
 loadSprite("portal", "/sprites/portal.png");
-loadSound("score", "/examples/sounds/score.mp3");
-loadSound("portal", "/examples/sounds/portal.mp3");
-
+loadSound("coins", "/audio/coin.mp3");
+loadSound("portal", "/audio/portal.mp3");
+loadSound("alarm", "/audio/alarm.mp3");
 setGravity(1600);
 
 const SPEED = 380;
 
-// Design 2 levels
+// Levels
 const LEVELS = [
+    // tutorial
     [
-        "O@                           >  =",
-        "=================================",
+        "=                 $                 =",
+        "=@                $             >   =",
+        "=O  $    $    ^^  $  ^^  $$$   ^=^^^=",
+        "=====================================",
     ],
+    // the box
     [
-		"==============",
-        "=            =",
-		"=            =",
-		"=            =",
-        "=O@  ^ $$   >=",
-        "==============",
+		"=======================",
+        "=                     =",
+        "=                     =",
+		"=       =====         =",
+		"=@                    =",
+        "=O   ^^ $$$$$ ^^     >=",
+        "=======================",
     ],
+    // jump for it
     [
-        "O@   $   >",
-        "===  ==  =",
+        "                                             $$$     $         ",
+        "                                            =====              ",
+        "                            ^                                  ",
+        "                        ^   =        =   =                  >  ",
+        "O@    $   $     ^       =$$$=                $$$    ^^^     =  ",
+        "===  ===  =   =====   =========    =   =    ===================",
     ],
+    // the broken bridge
 	[
-        "                    $$$$     ==",
-		"               $$          > ==",
-		"       =   =   ==  =  =   =====",
-		"       =                    ===",
-		"   =   =                  $$$==",
-		"O@                     ^^^$$$==",
-		"===============================",
+        "                      $$$$       ==",
+		"                 $$            > ==",
+		"       =    ==   ==   =  =    =====",
+		"       =                        ===",
+		"   =   =                     $$$===",
+		"O@        ^   ^^^     ^^  ^^ $$$===",
+		"==================================",
 	],
 ];
 
@@ -55,11 +66,17 @@ for (const level of LEVELS) {
         totalCoins += (row.match(/\$/g) || []).length;
     }
 }
-    
 
+    
+function restart(levelId, coins: any) {
+    go("game", {
+        levelId: levelId,
+        coins: coins,
+    });
+}
 // Define a scene called "game". The callback will be run when we go() to the scene
 // Scenes can accept argument from go()
-scene("game", ({ levelId, score }) => {
+scene("game", ({ levelId, coins }) => {
     // Use the level passed, or first level
 	let coinsCollected = 0;
     const level = addLevel(LEVELS[levelId || 0], {
@@ -78,6 +95,7 @@ scene("game", ({ levelId, score }) => {
                 "player",
                 {
                     locked: false,
+                    dead: false,
                 },
             ],
             "O": () => [
@@ -91,6 +109,7 @@ scene("game", ({ levelId, score }) => {
                 "player2",
                 {
                     locked: false,
+                    dead: false,
                 },
             ],
             "=": () => [
@@ -109,7 +128,9 @@ scene("game", ({ levelId, score }) => {
             ],
             "^": () => [
                 sprite("spike"),
-                area(),
+                area({
+                    scale: 0.75,
+                }),
                 anchor("bot"),
                 "danger",
                 offscreen({ hide: true, distance: 64 }),
@@ -130,10 +151,10 @@ scene("game", ({ levelId, score }) => {
     debug.log("level: " + levelId)
     // Movements
     onKeyPress("up", () => {
-        if (player.isGrounded() && !player.locked) {
+        if (player.isGrounded() && !player.locked ) {
             player.jump();
         } 
-        if (player.locked) {
+        if (player.locked && !player.dead && !player2.dead) {
             player.locked = false;
         }
     });
@@ -153,7 +174,7 @@ scene("game", ({ levelId, score }) => {
         if (player2.isGrounded() && !player2.locked) {
             player2.jump();
         }
-        if (player2.locked) {
+        if (player2.locked && !player.dead && !player2.dead) {
             player2.locked = false;
         }
     });
@@ -176,7 +197,10 @@ scene("game", ({ levelId, score }) => {
             camPos(player.pos)
         }
     })
+    let player2InViewport = true;
+    
     player2.onExitScreen(() => {
+        player2InViewport = false;
         debug.log("Player 2 left the screen");
         const warnText = add([
             text("Stick together!"),
@@ -189,44 +213,47 @@ scene("game", ({ levelId, score }) => {
             opacity(0),
             timer(),
         ])
-        warnText.loop(2, async () => {
+        const warnLoop = warnText.loop(2, async () => {
+            play("alarm");
             await tween(0, 1, 1, (val) => warnText.opacity = val, easings.easeInOutCubic)
         })
         wait(5, () => {
-            if (player2) {
-                shake(120);
-
+            if (!player2InViewport) {
+                shake(72);
+                debug.log("You couldn't stick together!");
+                player.dead = true; player.locked = true;
+                player2.dead = true; player2.locked = true;
+                wait(3, () => {
+                    go("lose");
+                })
+                
             }
+            warnLoop.cancel();
         })
     })
     player2.onEnterScreen(() => {
+        player2InViewport = true;
         debug.log("Player 2 entered the screen");
         destroyAll("warning");
     })
     player.onCollide("danger", () => {
-        go("game", {
-			levelId: levelId,
-			score: score,
-		})
+        restart(levelId, coins);
     })
     player2.onCollide("danger", () => {
-        go("game", {
-            levelId: levelId,
-            score: score,
-        })
+        restart(levelId, coins)
     })
 
     player.onCollide("coin", (coin) => {
         destroy(coin);
-        play("score");
+        play("coins");
         coinsCollected++;
-        scoreLabel.text = score + coinsCollected;
+        coinsLabel.text = coins + coinsCollected;
     })
     player2.onCollide("coin", (coin) => {
         destroy(coin);
-        play("score");
+        play("coins");
         coinsCollected++;
-        scoreLabel.text = score + coinsCollected;
+        coinsLabel.text = coins + coinsCollected;
     })
 
     // Fall death
@@ -234,7 +261,7 @@ scene("game", ({ levelId, score }) => {
         if (player.pos.y >= 680) {
             go("game", {
 				levelId: levelId,
-				score: score,
+				coins: coins,
 			})
         }
         if (player.locked) {
@@ -245,10 +272,7 @@ scene("game", ({ levelId, score }) => {
     })
     player2.onUpdate(() => {
         if (player2.pos.y >= 680) {
-            go("game", {
-                levelId: levelId,
-                score: score,
-            })
+            restart(levelId, coins)
         }
         if (player2.locked) {
             player2.opacity = 0;
@@ -266,11 +290,11 @@ scene("game", ({ levelId, score }) => {
             if (levelId < LEVELS.length - 1) {
                 go("game", {
                     levelId: levelId + 1,
-                    score: score + coinsCollected,
+                    coins: coins + coinsCollected,
                 });
             }
             else {
-                go("win", { score: score + coinsCollected });
+                go("win", { coins: coins + coinsCollected });
             }
         }
     });
@@ -282,38 +306,49 @@ scene("game", ({ levelId, score }) => {
             if (levelId < LEVELS.length - 1) {
                 go("game", {
                     levelId: levelId + 1,
-                    score: score + coinsCollected,
+                    coins: coins + coinsCollected,
                 });
             }
             else {
-                go("win", { score: score + coinsCollected });
+                go("win", { coins: coins + coinsCollected });
             }
         }
     });
-    // Score counter text
-    const scoreLabel = add([
-        text(score),
+    // coins counter text
+    const coinsLabel = add([
+        text(coins),
         pos(12),
         fixed(),
     ]);
 });
-
-scene("win", ({ score }) => {
+scene("lose", () => {
     add([
-        text(`You grabbed ${score} coins!!!`, {
+        text("You lost!"),
+        scale(3),
+        outline(12, BLACK),
+        anchor("center"),
+        pos(center()),
+    ]);
+    onKeyPress(start);
+})
+scene("win", ({ coins }) => {
+    add([
+        text(`You won!\nYou grabbed ${coins} out of ${totalCoins}coins!!!`, {
             width: width(),
         }),
-        pos(12),
+        scale(3),
+        color(WHITE),
+        outline(12, BLACK),
+        pos(width()/2, height()/2 - height()/4),
+        anchor("center",)
     ]);
-
     onKeyPress(start);
 });
 
 function start() {
-    // Start with the "game" scene, with initial parameters
     go("game", {
         levelId: 0,
-        score: 0,
+        coins: 0,
     });
 }
 
