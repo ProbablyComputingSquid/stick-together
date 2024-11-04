@@ -7,14 +7,15 @@ import "kaplay/global";
 kaplay();
 
 // Load assets
-loadSprite("bean", " /sprites/bean.png");
+loadSprite("bean", "/sprites/bean.png");
+loadSprite("bean2", "/sprites/bean2.png");
 loadSprite("coin", "/sprites/coin.png");
 loadSprite("spike", "/sprites/spike.png");
 loadSprite("grass", "/sprites/grass.png");
 loadSprite("sand", "/sprites/sand.png")
 loadSprite("ghosty", "/sprites/ghosty.png");
 loadSprite("portal", "/sprites/portal.png");
-loadSprite("button", "/sprite/button.png")
+loadSprite("button", "/sprites/button.png")
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
@@ -48,8 +49,8 @@ const LEVELS = [
         "                                             $$$     $         ",
         "                                            =====              ",
         "                                                               ",
-        "                        ^   ^        =   =                  >  ",
-        "O@    $   $     ^       =$$$=                $$$    ^^^     =  ",
+        "                        ^   a        =   =                  >  ",
+        "O@    $   $     ^       =$$$=A               $$$    ^^^     =  ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
     // the broken bridge
@@ -64,7 +65,6 @@ const LEVELS = [
 	],
     // aMAZEng
     [
-        //"===============================================================",
         "                               $$=                            =",
         " $    ==================     ^ $$=     ===================--===",
         "==                  $$$=   =======    ==      $     =$$$$$  $$=",
@@ -102,7 +102,7 @@ scene("game", ({ levelId, coins }) => {
             "@": () => [
                 sprite("bean"),
                 area({
-                        scale:0.7
+                        scale:1
                     }),
                 body({jumpForce:700}),
                 anchor("center"),
@@ -117,10 +117,10 @@ scene("game", ({ levelId, coins }) => {
                 },
             ],
             "O": () => [
-                sprite("bean"),
+                sprite("bean2"),
                 area(
                     {
-                        scale:0.7
+                        scale:1
                     }
                 ),
                 body({jumpForce:700}),
@@ -175,6 +175,7 @@ scene("game", ({ levelId, coins }) => {
             "A": () => [
                 sprite("button"),
                 area(),
+                body(),
                 anchor("bot"),
                 pos(),
                 "button",
@@ -186,6 +187,7 @@ scene("game", ({ levelId, coins }) => {
                 area(),
                 anchor("bot"),
                 pos(),
+                body({isStatic: true}),
                 "door",
                 "doorA",
                 "A",
@@ -293,7 +295,10 @@ scene("game", ({ levelId, coins }) => {
         restart(levelId, coins)
     })
     onCollide("player", "buttonA", (player, button) => {
-        destroyAll("A");
+        destroy(button);
+
+        level.get("doorA").forEach(destroy);
+        debug.log("here!");
     })
 
     onCollide("player", "coin", (player, coin) => {
