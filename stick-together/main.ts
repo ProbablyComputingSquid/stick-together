@@ -15,7 +15,8 @@ loadSprite("grass", "/sprites/grass.png");
 loadSprite("sand", "/sprites/sand.png")
 loadSprite("ghosty", "/sprites/ghosty.png");
 loadSprite("portal", "/sprites/portal.png");
-loadSprite("button", "/sprites/button.png")
+loadSprite("button", "/sprites/button.png");
+loadSprite("buttonB", "/sprites/buttonB.png");
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
@@ -43,6 +44,16 @@ const LEVELS = [
 		"=@                    =",
         "=O   ^^ $$$$$ ^^     >=",
         "=======================",
+    ],
+    // the jump
+    [
+        "       a                                            ",
+        "       a                                            ",
+        "      =a                                            ",
+        "       a                                            ",
+        "       abbb    A  B                                 ",
+        "O @    a^^^^^^ =  =                             >   ",
+        "====================================================",
     ],
     // jump for it
     [
@@ -192,7 +203,29 @@ scene("game", ({ levelId, coins }) => {
                 "door",
                 "doorA",
                 "A",
+            ],
+            "B": () => [
+                sprite("buttonB"),
+                area(),
+                body(),
+                anchor("bot"),
+                pos(),
+                "button",
+                "buttonB",
+                "B",
+            ],
+            "b": () => [
+                sprite("sand"),
+                area(),
+                anchor("bot"),
+                pos(),
+                body({isStatic: true}),
+                opacity(0),
+                "door",
+                "doorB",
+                "B",
             ]
+
         },
     });
 
@@ -301,7 +334,14 @@ scene("game", ({ levelId, coins }) => {
         level.get("doorA").forEach(destroy);
         debug.log("here!");
     })
+    onCollide("player", "buttonB", (player, button) => {
+        destroy(button);
 
+        level.get("doorB").forEach(door => {
+            door.opacity = 1;
+        });
+        debug.log("there!");
+    })
     onCollide("player", "coin", (player, coin) => {
         destroy(coin);
         play("coins");
