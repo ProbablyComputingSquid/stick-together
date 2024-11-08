@@ -21,13 +21,6 @@ stick together is a cooperative multiplayer platformer. the only enemy is yourse
 
 ### steps:
 
-```bash
-cd stick-together
-npm install
-npm run dev
-```
-Open http://localhost:5173/ in your browser or whatever port you're using.
-
 ## using esbuild for static deployment
 
 ### requires: 
@@ -35,10 +28,23 @@ Open http://localhost:5173/ in your browser or whatever port you're using.
 - npm
 - a friend to play with
 
-### 
+#### building the project
 
 ```bash
 cd stick-together
 npm install
 npm run build
 ```
+#### viewing project 
+
+##### dev preview
+```bash
+npm run dev
+``` 
+or, if you want live updates:
+
+```bash
+npm install -g esbuild
+esbuild main.ts > build.js --bundle --watch
+```
+and visit index.html (`npm run dev` works too but it's a waste of compute resources)

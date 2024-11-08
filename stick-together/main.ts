@@ -15,10 +15,14 @@ loadSprite("coin", "/sprites/coin.png");
 loadSprite("spike", "/sprites/spike.png");
 loadSprite("grass", "/sprites/grass.png");
 loadSprite("sand", "/sprites/sand.png")
+loadSprite("snow", "/sprites/snow.png");
+loadSprite("steel", "/sprites/steel.png");
 loadSprite("ghosty", "/sprites/ghosty.png");
 loadSprite("portal", "/sprites/portal.png");
 loadSprite("button", "/sprites/button.png");
 loadSprite("buttonB", "/sprites/buttonB.png");
+loadSprite("buttonC", "/sprites/buttonC.png");
+loadSprite("buttonD", "/sprites/buttonD.png");
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
@@ -31,11 +35,11 @@ const SPEED = 380;
 // Levels
 const LEVELS = [
     // test level
-    /*[
-        "   $   ",
-        "O@ ^  >",
-        "=======",
-    ],*/
+    [
+        "   $ A B C D        ",
+        "O@ ^ a b c d    >",
+        "=================",
+    ],
     // tutorial
     [
         "=                 $                 =",
@@ -214,6 +218,7 @@ scene("game", ({ levelId, coins }) => {
                 body(),
                 anchor("bot"),
                 pos(),
+                offscreen({hide: true, distance: 64}),
                 "button",
                 "buttonA",
                 "A",
@@ -224,6 +229,7 @@ scene("game", ({ levelId, coins }) => {
                 anchor("bot"),
                 pos(),
                 body({isStatic: true}),
+                offscreen({hide: true, distance: 64}),
                 "door",
                 "doorA",
                 "A",
@@ -234,21 +240,69 @@ scene("game", ({ levelId, coins }) => {
                 body(),
                 anchor("bot"),
                 pos(),
+                offscreen({hide: true, distance: 64}),
                 "button",
                 "buttonB",
                 "B",
             ],
             "b": () => [
-                sprite("sand"),
+                sprite("grass"),
                 area(),
                 anchor("bot"),
                 pos(),
                 body({isStatic: true}),
                 opacity(0),
-                "door",
-                "doorB",
+                offscreen({hide: true, distance: 64}),
+                "path",
+                "pathB",
                 "B",
+            ],
+            "C": () => [
+                sprite("buttonC"),
+                area(),
+                body(),
+                anchor("bot"),
+                pos(),
+                offscreen({hide: true, distance: 64}),
+                "button",
+                "buttonD",
+                "D",
+            ],
+            "c": () => [
+                sprite("snow"),
+                area(),
+                anchor("bot"),
+                pos(),
+                body({isStatic: true}),
+                offscreen({hide: true, distance: 64}),
+                "door",
+                "doorC",
+                "C",
+            ],
+            "D": () => [
+                sprite("buttonD"),
+                area(),
+                body(),
+                anchor("bot"),
+                pos(),
+                offscreen({hide: true, distance: 64}),
+                "button",
+                "buttonD",
+                "D",
+            ],
+            "d": () => [
+                sprite("steel"),
+                area(),
+                anchor("bot"),
+                pos(),
+                body({isStatic: true}),
+                opacity(0),
+                offscreen({hide: true, distance: 64}),
+                "path",
+                "pathD",
+                "D",
             ]
+            
 
         },
     });
@@ -353,15 +407,29 @@ scene("game", ({ levelId, coins }) => {
         destroy(button);
 
         level.get("doorA").forEach(destroy);
-        debug.log("here!");
+        //debug.log("here!");
     })
     onCollide("player", "buttonB", (player, button) => {
         destroy(button);
 
-        level.get("doorB").forEach(door => {
+        level.get("pathB").forEach(door => {
             door.opacity = 1;
         });
-        debug.log("there!");
+        //debug.log("there!");
+    })
+    onCollide("player", "buttonC", (player, button) => {
+        destroy(button);
+
+        level.get("doorC").forEach(destroy);
+        //debug.log("where!");
+    })
+    onCollide("player", "buttonD", (player, button) => {
+        destroy(button);
+
+        level.get("pathD").forEach(door => {
+            door.opacity = 1;
+        });
+        //debug.log("idk!");
     })
     onCollide("player", "coin", (player, coin) => {
         destroy(coin);
