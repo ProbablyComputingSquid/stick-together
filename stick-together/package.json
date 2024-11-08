@@ -2,7 +2,7 @@
 	"name": "stick-together",
 	"type": "module",
 	"scripts": {
-		"build": "vite build",
+		"build": "esbuild main.ts > build.js --minify --bundle",
 		"dev": "vite",
 		"preview": "vite preview",
 		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip www -x \"**/.DS_Store\"",
