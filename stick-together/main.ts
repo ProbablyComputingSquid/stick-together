@@ -30,11 +30,17 @@ const SPEED = 380;
 
 // Levels
 const LEVELS = [
+    // test level
+    /*[
+        "   $   ",
+        "O@ ^  >",
+        "=======",
+    ],*/
     // tutorial
     [
         "=                 $                 =",
         "=@                $             >   =",
-        "=O  $    $    ^^  $  ^^  $$$ ^^^=^^^=",
+        "=O  $    $    ^^  $  ^^  $$$ ^^===^^=",
         "=====================================",
     ],
     // the broken bridge
@@ -54,13 +60,13 @@ const LEVELS = [
         "=  $$$    =",
         "=  $$$    =",
         "=  $$$    =",
-        "=  $$$    =",
+        "=  $ $    =",
         "=  ^^^    =",
         "========  =",
         "=         =",
         "=   =======",
         "=        >=",
-        "=        ==",
+        "=       ===",
         "=     =   =",
         "=^^^      =",
         "===========",
@@ -83,7 +89,7 @@ const LEVELS = [
         "                                            =====              ",
         "                        ^   a                                  ",
         "                        =   a        =   =                  >  ",
-        "O @   $   $     ^       =$$$=A               $$$    ^^^     =  ",
+        "O @   $   $     ^       =$$$=A               $$$    ^^^    === ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
     // the high jump
@@ -133,13 +139,11 @@ scene("game", ({ levelId, coins }) => {
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
-        pos: vec2(0, 0),
+        pos: vec2(0,0),
         tiles: {
             "@": () => [
                 sprite("bean"),
-                area({
-                        scale:1
-                    }),
+                area({scale:1}),
                 body({jumpForce:700}),
                 anchor("center"),
 				pos(),
@@ -154,11 +158,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "O": () => [
                 sprite("bean2"),
-                area(
-                    {
-                        scale:1
-                    }
-                ),
+                area({scale:1}),
                 body({jumpForce:700}),
                 anchor("center"),
 				pos(),
@@ -372,7 +372,7 @@ scene("game", ({ levelId, coins }) => {
 
     // Fall death
     player1.onUpdate(() => {
-        if (player1.pos.y >= 600 || player2.pos.y >= 680) {
+        if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
             restart(levelId, coins)
         }
         if (player1.locked) {
@@ -393,6 +393,7 @@ scene("game", ({ levelId, coins }) => {
         play("portal");
         player.portal = true;
         player.locked = true;
+        player.area.scale = 0.1;
         if (player1.portal && player2.portal) {
             if (levelId < LEVELS.length - 1) {
                 go("game", {

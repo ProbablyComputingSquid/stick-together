@@ -5613,11 +5613,17 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
   setGravity(1600);
   var SPEED = 380;
   var LEVELS = [
+    // test level
+    /*[
+        "   $   ",
+        "O@ ^  >",
+        "=======",
+    ],*/
     // tutorial
     [
       "=                 $                 =",
       "=@                $             >   =",
-      "=O  $    $    ^^  $  ^^  $$$ ^^^=^^^=",
+      "=O  $    $    ^^  $  ^^  $$$ ^^===^^=",
       "====================================="
     ],
     // the broken bridge
@@ -5634,17 +5640,18 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
     [
       "O@ $$$    A",
       "===aaa=====",
+      "=  $$$    =",
+      "=  $$$    =",
+      "=  $$$    =",
+      "=  $ $    =",
+      "=  ^^^    =",
+      "========  =",
       "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
-      "=         =",
+      "=   =======",
       "=        >=",
+      "=       ===",
+      "=     =   =",
+      "=^^^      =",
       "==========="
     ],
     // the box
@@ -5665,7 +5672,7 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
       "                                            =====              ",
       "                        ^   a                                  ",
       "                        =   a        =   =                  >  ",
-      "O @   $   $     ^       =$$$=A               $$$    ^^^     =  ",
+      "O @   $   $     ^       =$$$=A               $$$    ^^^    === ",
       "===  ===  =   =====   =========    =   =    ==================="
     ],
     // the high jump
@@ -5714,9 +5721,7 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
       tiles: {
         "@": () => [
           sprite("bean"),
-          area({
-            scale: 1
-          }),
+          area({ scale: 1 }),
           body({ jumpForce: 700 }),
           anchor("center"),
           pos(),
@@ -5731,11 +5736,7 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
         ],
         "O": () => [
           sprite("bean2"),
-          area(
-            {
-              scale: 1
-            }
-          ),
+          area({ scale: 1 }),
           body({ jumpForce: 700 }),
           anchor("center"),
           pos(),
@@ -5943,7 +5944,7 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
       coinsLabel.text = coins + coinsCollected;
     });
     player1.onUpdate(() => {
-      if (player1.pos.y >= 600 || player2.pos.y >= 680) {
+      if (player1.pos.y >= 1e3 || player2.pos.y >= 1e3) {
         restart(levelId, coins);
       }
       if (player1.locked) {
@@ -5961,6 +5962,7 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
       play("portal");
       player.portal = true;
       player.locked = true;
+      player.area.scale = 0.1;
       if (player1.portal && player2.portal) {
         if (levelId < LEVELS.length - 1) {
           go("game", {
