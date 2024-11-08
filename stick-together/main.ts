@@ -8,7 +8,9 @@ kaplay();
 
 
 // Load assets
-loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/c8db0ddd3b6bd62da87fab9187c59bbb6d7a8220/stick-together/public/")
+// after further discovery, you have to update the url below every time new assets get added
+// I will try to find a way to automate this
+loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/eb019b21d8ebd1ea4e8db11f7135803c22496408/stick-together/public")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2.png");
 loadSprite("coin", "/sprites/coin.png");
@@ -26,7 +28,7 @@ loadSprite("buttonD", "/sprites/buttonD.png");
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
-
+loadSound("vine-boom", "/audio/vine-boom.mp3");
 
 setGravity(1600);
 
@@ -36,6 +38,7 @@ const SPEED = 380;
 const LEVELS = [
     // test level
     [
+        "L",
         "   $ A B C D        ",
         "O@ ^ a b c d    >",
         "=================",
@@ -265,7 +268,7 @@ scene("game", ({ levelId, coins }) => {
                 pos(),
                 offscreen({hide: true, distance: 64}),
                 "button",
-                "buttonD",
+                "buttonC",
                 "D",
             ],
             "c": () => [
@@ -301,8 +304,16 @@ scene("game", ({ levelId, coins }) => {
                 "path",
                 "pathD",
                 "D",
-            ]
-            
+            ],
+            "L": () => [
+                text("Level " + (levelId+1)),
+                pos(),
+                color(WHITE),
+                outline(32, BLACK),
+                scale(2),
+                "levelText",
+                anchor("center"),
+            ],
 
         },
     });
@@ -377,7 +388,7 @@ scene("game", ({ levelId, coins }) => {
             scale(3),
         ])
         const warnLoop = warnText.loop(2, async () => {
-            play("alarm");
+            play("alarm", {volume:0.5});
             await tween(0, 1, 1, (val) => warnText.opacity = val, easings.easeInOutCubic)
             if (player2InViewport) {warnLoop.cancel()}
         })
