@@ -6,7 +6,9 @@ import "kaplay/global";
 // Start game
 kaplay();
 
+
 // Load assets
+loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/c8db0ddd3b6bd62da87fab9187c59bbb6d7a8220/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2.png");
 loadSprite("coin", "/sprites/coin.png");
@@ -35,17 +37,6 @@ const LEVELS = [
         "=O  $    $    ^^  $  ^^  $$$ ^^^=^^^=",
         "=====================================",
     ],
-    // the box
-    [
-        "                        $$$     A            ",
-		"        aaaaa           $$$   bbbbb          ",
-        "=       a   a           $$$          b       ",
-        "=       a < a     $$^$$                 b    ",
-		"=       =====          bbbbb                b",
-		"=@                                       b  ",
-        "=O   ^^ $$$$$ ^^ $$ ^^                 B    ",
-        "==============================================",
-    ],
     // the broken bridge
 	[
         "                      $$$$       ==",
@@ -56,6 +47,36 @@ const LEVELS = [
 		"O@        ^^^  ^^^  ^^^  ^^^ $$$===",
 		"==================================",
 	],
+    // the pit
+    [
+        "O@ $$$    A",
+        "===aaa=====",
+        "=  $$$    =",
+        "=  $$$    =",
+        "=  $$$    =",
+        "=  $$$    =",
+        "=  ^^^    =",
+        "========  =",
+        "=         =",
+        "=   =======",
+        "=        >=",
+        "=        ==",
+        "=     =   =",
+        "=^^^      =",
+        "===========",
+    ],
+    // the box
+    [
+        "                        $$$     A            ",
+		"        aaaaa           $$$   bbbbb          ",
+        "=       a   a  bb       $$$          b       ",
+        "=       a > a     bbb  $$^$$            b    ",
+		"=       =====          bbbbb                b",
+        "=                                            ",
+		"=@                                       b   ",
+        "=O   ^^ $$$$$ ^^ $$ ^^                 B     ",
+        "==============================================",
+    ],
     // jump for it
     [
         "                                             $$$     $         ",
@@ -112,7 +133,7 @@ scene("game", ({ levelId, coins }) => {
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
-        //pos: vec2(100, 200),
+        pos: vec2(0, 0),
         tiles: {
             "@": () => [
                 sprite("bean"),
@@ -417,7 +438,7 @@ scene("win", ({ coins }) => {
 
 function start() {
     go("game", {
-        levelId: 1,
+        levelId: 0,
         coins: 0,
     });
 }

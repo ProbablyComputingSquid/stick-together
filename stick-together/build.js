@@ -5596,12 +5596,17 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
 
   // main.ts
   e2();
+  loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/c8db0ddd3b6bd62da87fab9187c59bbb6d7a8220/stick-together/public/");
   loadSprite("bean", "/sprites/bean.png");
+  loadSprite("bean2", "/sprites/bean2.png");
   loadSprite("coin", "/sprites/coin.png");
   loadSprite("spike", "/sprites/spike.png");
   loadSprite("grass", "/sprites/grass.png");
+  loadSprite("sand", "/sprites/sand.png");
   loadSprite("ghosty", "/sprites/ghosty.png");
   loadSprite("portal", "/sprites/portal.png");
+  loadSprite("button", "/sprites/button.png");
+  loadSprite("buttonB", "/sprites/buttonB.png");
   loadSound("coins", "/audio/coin.mp3");
   loadSound("portal", "/audio/portal.mp3");
   loadSound("alarm", "/audio/alarm.mp3");
@@ -5612,27 +5617,8 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
     [
       "=                 $                 =",
       "=@                $             >   =",
-      "=O  $    $    ^^  $  ^^  $$$   ^=^^^=",
+      "=O  $    $    ^^  $  ^^  $$$ ^^^=^^^=",
       "====================================="
-    ],
-    // the box
-    [
-      "=======================",
-      "=                     =",
-      "=                     =",
-      "=       =====         =",
-      "=@                    =",
-      "=O   ^^ $$$$$ ^^     >=",
-      "======================="
-    ],
-    // jump for it
-    [
-      "                                             $$$     $         ",
-      "                                            =====              ",
-      "                            ^                                  ",
-      "                        ^   =        =   =                  >  ",
-      "O@    $   $     ^       =$$$=                $$$    ^^^     =  ",
-      "===  ===  =   =====   =========    =   =    ==================="
     ],
     // the broken bridge
     [
@@ -5641,8 +5627,70 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
       "       =    ==   ==   =  =    =====",
       "       =                        ===",
       "   =   =                     $$$===",
-      "O@        ^   ^^^     ^^  ^^ $$$===",
+      "O@        ^^^  ^^^  ^^^  ^^^ $$$===",
       "=================================="
+    ],
+    // the pit
+    [
+      "O@ $$$    A",
+      "===aaa=====",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=         =",
+      "=        >=",
+      "==========="
+    ],
+    // the box
+    [
+      "                        $$$     A            ",
+      "        aaaaa           $$$   bbbbb          ",
+      "=       a   a  bb       $$$          b       ",
+      "=       a > a     bbb  $$^$$            b    ",
+      "=       =====          bbbbb                b",
+      "=                                            ",
+      "=@                                       b   ",
+      "=O   ^^ $$$$$ ^^ $$ ^^                 B     ",
+      "=============================================="
+    ],
+    // jump for it
+    [
+      "                                             $$$     $         ",
+      "                                            =====              ",
+      "                        ^   a                                  ",
+      "                        =   a        =   =                  >  ",
+      "O @   $   $     ^       =$$$=A               $$$    ^^^     =  ",
+      "===  ===  =   =====   =========    =   =    ==================="
+    ],
+    // the high jump
+    [
+      "                $B$                         ",
+      "                ===                         ",
+      "        a            $                      ",
+      "        a          $ =             >        ",
+      "       =a          =     b    b  =====   b  ",
+      "        a                                   ",
+      "        abbb   A  =  =            $$$  b    ",
+      "O @     a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
+      "============================================="
+    ],
+    // aMAZEng
+    [
+      "                               $$=                            =",
+      " $    ==================     ^ $$=     ===================--===",
+      "==                  $$$=   =======    ==      $     =$$$$$  $$=",
+      " $    ======================     ====  =    ======  ======--===",
+      "==                         =  $$$                =          a>=",
+      "      ===============-     =  =================  ==============",
+      "     =               -                        =               =",
+      "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A=",
+      "==============================================================="
     ]
   ];
   var totalCoins = 0;
@@ -5662,30 +5710,38 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
     const level = addLevel(LEVELS[levelId || 0], {
       tileWidth: 64,
       tileHeight: 64,
-      //pos: vec2(100, 200),
+      pos: vec2(0, 0),
       tiles: {
         "@": () => [
           sprite("bean"),
-          area(),
+          area({
+            scale: 1
+          }),
           body({ jumpForce: 700 }),
           anchor("center"),
           pos(),
           opacity(1),
           offscreen({ hide: false, destroy: false }),
           "player",
+          "player1",
           {
             locked: false,
             dead: false
           }
         ],
         "O": () => [
-          sprite("bean"),
-          area(),
+          sprite("bean2"),
+          area(
+            {
+              scale: 1
+            }
+          ),
           body({ jumpForce: 700 }),
           anchor("center"),
           pos(),
           opacity(1),
           offscreen({ hide: false, destroy: false }),
+          "player",
           "player2",
           {
             locked: false,
@@ -5696,6 +5752,13 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
           sprite("grass"),
           area(),
           body({ isStatic: true }),
+          anchor("bot"),
+          offscreen({ hide: true, distance: 64 })
+        ],
+        // secret pass-through grass
+        "-": () => [
+          sprite("grass"),
+          area(),
           anchor("bot"),
           offscreen({ hide: true, distance: 64 })
         ],
@@ -5721,37 +5784,78 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
           anchor("bot"),
           "portal",
           offscreen({ hide: true, distance: 64 })
+        ],
+        "A": () => [
+          sprite("button"),
+          area(),
+          body(),
+          anchor("bot"),
+          pos(),
+          "button",
+          "buttonA",
+          "A"
+        ],
+        "a": () => [
+          sprite("sand"),
+          area(),
+          anchor("bot"),
+          pos(),
+          body({ isStatic: true }),
+          "door",
+          "doorA",
+          "A"
+        ],
+        "B": () => [
+          sprite("buttonB"),
+          area(),
+          body(),
+          anchor("bot"),
+          pos(),
+          "button",
+          "buttonB",
+          "B"
+        ],
+        "b": () => [
+          sprite("sand"),
+          area(),
+          anchor("bot"),
+          pos(),
+          body({ isStatic: true }),
+          opacity(0),
+          "door",
+          "doorB",
+          "B"
         ]
       }
     });
-    const player = level.get("player")[0];
+    const player1 = level.get("player1")[0];
     const player2 = level.get("player2")[0];
     debug.log("level: " + levelId);
     onKeyPress("up", () => {
-      if (player.isGrounded() && !player.locked) {
-        player.jump();
+      if (player1.isGrounded() && !player1.locked) {
+        player1.jump();
       }
-      if (player.locked && !player.dead && !player2.dead) {
-        player.locked = false;
+      if (player1.locked && !player1.dead && !player2.dead) {
+        player1.locked = false;
       }
     });
     onKeyDown("left", () => {
-      if (!player.locked) {
-        player.move(-SPEED, 0);
-        player.flipX = true;
+      if (!player1.locked) {
+        player1.move(-SPEED, 0);
+        player1.flipX = true;
       }
     });
     onKeyDown("right", () => {
-      if (!player.locked) {
-        player.move(SPEED, 0);
-        player.flipX = false;
+      if (!player1.locked) {
+        player1.move(SPEED, 0);
+        player1.flipX = false;
       }
     });
     onKeyPress("w", () => {
       if (player2.isGrounded() && !player2.locked) {
         player2.jump();
       }
-      if (player2.locked && !player.dead && !player2.dead) {
+      if (player2.locked && !player1.dead && !player2.dead) {
         player2.locked = false;
       }
     });
@@ -5767,11 +5871,11 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
         player2.flipX = false;
       }
     });
-    player.onUpdate(() => {
-      if (player.locked) {
+    player1.onUpdate(() => {
+      if (player1.locked) {
         camPos(player2.pos);
       } else {
-        camPos(player.pos);
+        camPos(player1.pos);
       }
     });
     let player2InViewport = true;
@@ -5787,21 +5891,25 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
         "warning",
         fixed(),
         opacity(0),
-        timer()
+        timer(),
+        scale(3)
       ]);
       const warnLoop = warnText.loop(2, async () => {
         play("alarm");
         await tween(0, 1, 1, (val) => warnText.opacity = val, easings.easeInOutCubic);
+        if (player2InViewport) {
+          warnLoop.cancel();
+        }
       });
       wait(5, () => {
         if (!player2InViewport) {
           shake(72);
           debug.log("You couldn't stick together!");
-          player.dead = true;
-          player.locked = true;
+          player1.dead = true;
+          player1.locked = true;
           player2.dead = true;
           player2.locked = true;
-          wait(3, () => {
+          wait(2, () => {
             go("lose");
           });
         }
@@ -5813,40 +5921,35 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
       debug.log("Player 2 entered the screen");
       destroyAll("warning");
     });
-    player.onCollide("danger", () => {
+    onCollide("player", "danger", () => {
       restart(levelId, coins);
     });
-    player2.onCollide("danger", () => {
-      restart(levelId, coins);
+    onCollide("player", "buttonA", (player, button) => {
+      destroy(button);
+      level.get("doorA").forEach(destroy);
+      debug.log("here!");
     });
-    player.onCollide("coin", (coin) => {
+    onCollide("player", "buttonB", (player, button) => {
+      destroy(button);
+      level.get("doorB").forEach((door) => {
+        door.opacity = 1;
+      });
+      debug.log("there!");
+    });
+    onCollide("player", "coin", (player, coin) => {
       destroy(coin);
       play("coins");
       coinsCollected++;
       coinsLabel.text = coins + coinsCollected;
     });
-    player2.onCollide("coin", (coin) => {
-      destroy(coin);
-      play("coins");
-      coinsCollected++;
-      coinsLabel.text = coins + coinsCollected;
-    });
-    player.onUpdate(() => {
-      if (player.pos.y >= 680) {
-        go("game", {
-          levelId,
-          coins
-        });
-      }
-      if (player.locked) {
-        player.opacity = 0;
-      } else {
-        player.opacity = 1;
-      }
-    });
-    player2.onUpdate(() => {
-      if (player2.pos.y >= 680) {
+    player1.onUpdate(() => {
+      if (player1.pos.y >= 600 || player2.pos.y >= 680) {
         restart(levelId, coins);
+      }
+      if (player1.locked) {
+        player1.opacity = 0;
+      } else {
+        player1.opacity = 1;
       }
       if (player2.locked) {
         player2.opacity = 0;
@@ -5854,26 +5957,11 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
         player2.opacity = 1;
       }
     });
-    player.onCollide("portal", () => {
+    onCollide("player", "portal", (player, portal) => {
       play("portal");
       player.portal = true;
       player.locked = true;
-      if (player2.portal) {
-        if (levelId < LEVELS.length - 1) {
-          go("game", {
-            levelId: levelId + 1,
-            coins: coins + coinsCollected
-          });
-        } else {
-          go("win", { coins: coins + coinsCollected });
-        }
-      }
-    });
-    player2.onCollide("portal", () => {
-      play("portal");
-      player2.portal = true;
-      player2.locked = true;
-      if (player.portal) {
+      if (player1.portal && player2.portal) {
         if (levelId < LEVELS.length - 1) {
           go("game", {
             levelId: levelId + 1,
@@ -5886,6 +5974,7 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
     });
     const coinsLabel = add([
       text(coins),
+      outline(4, BLACK),
       pos(12),
       fixed()
     ]);
@@ -5907,8 +5996,7 @@ You grabbed ${coins} out of ${totalCoins}coins!!!`, {
         width: width()
       }),
       scale(3),
-      color(WHITE),
-      outline(12, BLACK),
+      color(BLACK),
       pos(width() / 2, height() / 2 - height() / 4),
       anchor("center")
     ]);
