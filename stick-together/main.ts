@@ -12,7 +12,7 @@ kaplay();
 // I will try to find a way to automate this
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/eb019b21d8ebd1ea4e8db11f7135803c22496408/stick-together/public")
 loadSprite("bean", "/sprites/bean.png");
-loadSprite("bean2", "/sprites/bean2.png");
+loadSprite("bean2", "/sprites/bean2-alt.png");
 loadSprite("coin", "/sprites/coin.png");
 loadSprite("spike", "/sprites/spike.png");
 loadSprite("grass", "/sprites/grass.png");
