@@ -10,7 +10,7 @@ kaplay();
 // Load assets
 // after further discovery, you have to update the url below every time new assets get added
 // I will try to find a way to automate this
-loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/eb019b21d8ebd1ea4e8db11f7135803c22496408/stick-together/public")
+loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/c48de10c4e4fb663183b458b16a6ac19431f6aa8/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
 loadSprite("coin", "/sprites/coin.png");
@@ -38,10 +38,10 @@ const SPEED = 380;
 const LEVELS = [
     // test level
     [
-        "L",
-        "   $ A B C D        ",
-        "O@ ^ a b c d    >",
-        "=================",
+        " L     a       c",
+        "    $  a       c         ",
+        " O@ ^ Aa B   C c D     >",
+        "==========bb======ddddd==",
     ],
     // tutorial
     [
@@ -250,7 +250,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "b": () => [
                 sprite("grass"),
-                area(),
+                area({scale: 0.1}),
                 anchor("bot"),
                 pos(),
                 body({isStatic: true}),
@@ -295,7 +295,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "d": () => [
                 sprite("steel"),
-                area(),
+                area({scale: 0.1}),
                 anchor("bot"),
                 pos(),
                 body({isStatic: true}),
@@ -412,35 +412,29 @@ scene("game", ({ levelId, coins }) => {
         destroyAll("warning");
     })
     onCollide("player", "danger", () => {
+        play("vine-boom");
         restart(levelId, coins);
     })
-    onCollide("player", "buttonA", (player, button) => {
+    onCollide("player", "button", (player, button) => {
         destroy(button);
-
-        level.get("doorA").forEach(destroy);
-        //debug.log("here!");
     })
-    onCollide("player", "buttonB", (player, button) => {
-        destroy(button);
-
+    onCollide("player", "buttonA", () => {
+        level.get("doorA").forEach(destroy);
+    })
+    onCollide("player", "buttonB", () => {
         level.get("pathB").forEach(door => {
             door.opacity = 1;
+            door.area.scale = 1;
         });
-        //debug.log("there!");
     })
-    onCollide("player", "buttonC", (player, button) => {
-        destroy(button);
-
+    onCollide("player", "buttonC", () => {
         level.get("doorC").forEach(destroy);
-        //debug.log("where!");
     })
-    onCollide("player", "buttonD", (player, button) => {
-        destroy(button);
-
+    onCollide("player", "buttonD", () => {
         level.get("pathD").forEach(door => {
             door.opacity = 1;
+            door.area.scale = 1;
         });
-        //debug.log("idk!");
     })
     onCollide("player", "coin", (player, coin) => {
         destroy(coin);
