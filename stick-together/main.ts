@@ -10,7 +10,8 @@ kaplay();
 // Load assets
 // after further discovery, you have to update the url below every time new assets get added
 // I will try to find a way to automate this
-loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/c48de10c4e4fb663183b458b16a6ac19431f6aa8/stick-together/public/")
+const hash = "01efec970aa9f627857d24b4e651d0eb7dba96a8"
+loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
 loadSprite("coin", "/sprites/coin.png");
@@ -19,6 +20,7 @@ loadSprite("grass", "/sprites/grass.png");
 loadSprite("sand", "/sprites/sand.png")
 loadSprite("snow", "/sprites/snow.png");
 loadSprite("steel", "/sprites/steel.png");
+loadSprite("crate", "/sprites/crate.png");
 loadSprite("ghosty", "/sprites/ghosty.png");
 loadSprite("portal", "/sprites/portal.png");
 loadSprite("button", "/sprites/button.png");
@@ -45,7 +47,7 @@ const LEVELS = [
     ],
     // tutorial
     [
-        "=                 $                 =",
+        "=  L              $                 =",
         "=@                $             >   =",
         "=O  $    $    ^^  $  ^^  $$$ ^^===^^=",
         "=====================================",
@@ -55,13 +57,14 @@ const LEVELS = [
         "                      $$$$       ==",
 		"                 $$            > ==",
 		"       =    ==   ==   =  =    =====",
-		"       =                        ===",
+		"L      =                        ===",
 		"   =   =                     $$$===",
 		"O@        ^^^  ^^^  ^^^  ^^^ $$$===",
 		"==================================",
 	],
     // the pit
     [
+        "L          ",
         "O@ $$$    A",
         "===aaa=====",
         "=  $$$    =",
@@ -70,22 +73,23 @@ const LEVELS = [
         "=  $ $    =",
         "=  ^^^    =",
         "========  =",
-        "=         =",
+        "=        B=",
         "=   =======",
-        "=        >=",
-        "=       ===",
-        "=     =   =",
-        "=^^^      =",
+        "=   b   cc=",
+        "=   b   c>=",
+        "=   b   ===",
+        "=   b =   =",
+        "=^^^b    C=",
         "===========",
     ],
     // the box
     [
-        "                        $$$     A            ",
-		"        aaaaa           $$$   bbbbb          ",
-        "=       a   a  bb       $$$          b       ",
+        "$$$                     $$$     A            ",
+		"$$$     aaaaa           $$$   bb=bb          ",
+        "===     a   a  bb       $$$          b       ",
         "=       a > a     bbb  $$^$$            b    ",
 		"=       =====          bbbbb                b",
-        "=                                            ",
+        "= L                                          ",
 		"=@                                       b   ",
         "=O   ^^ $$$$$ ^^ $$ ^^                 B     ",
         "==============================================",
@@ -94,9 +98,9 @@ const LEVELS = [
     [
         "                                             $$$     $         ",
         "                                            =====              ",
-        "                        ^   a                                  ",
+        " L                      ^   a                                  ",
         "                        =   a        =   =                  >  ",
-        "O @   $   $     ^       =$$$=A               $$$    ^^^    === ",
+        "O @   $   $     ^       a$$$=A               $$$    ^^^    === ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
     // the high jump
@@ -106,7 +110,7 @@ const LEVELS = [
         "        a            $                      ",
         "        a          $ =             >        ",
         "       =a          =     b    b  =====   b  ",
-        "        a                                   ",
+        "L       a                                   ",
         "        abbb   A  =  =            $$$  b    ",
         "O @     a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
         "=============================================",
@@ -119,7 +123,7 @@ const LEVELS = [
         " $    ======================     ====  =    ======  ======--===",
         "==                         =  $$$                =          a>=",
         "      ===============-     =  =================  ==============",
-        "     =               -                        =               =",
+        "L    =               -                        =               =",
         "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A=",
         "===============================================================",
     ]
@@ -140,6 +144,29 @@ function restart(levelId: number, coins: number) {
     });
 }
 
+function makePath(position, name) {
+    if (name == "pathB") {
+        return add([
+            sprite("grass"),
+            area(),
+            anchor("bot"),
+            pos(position),
+            body({isStatic: true}),
+            offscreen({hide: true, distance: 64}),
+            "path", "pathB","B",
+        ])
+    } else if (name == "pathD") {
+        return add([
+            sprite("steel"),
+            area(),
+            anchor("bot"),
+            pos(position),
+            body({isStatic: true}),
+            offscreen({hide: true, distance: 64}),
+            "path","pathD","D",
+        ])
+    }
+}
 
 scene("game", ({ levelId, coins }) => {
 	let coinsCollected = 0;
@@ -249,16 +276,8 @@ scene("game", ({ levelId, coins }) => {
                 "B",
             ],
             "b": () => [
-                sprite("grass"),
-                area({scale: 0.1}),
-                anchor("bot"),
                 pos(),
-                body({isStatic: true}),
-                opacity(0),
-                offscreen({hide: true, distance: 64}),
-                "path",
-                "pathB",
-                "B",
+                "B","pathBPosition"
             ],
             "C": () => [
                 sprite("buttonC"),
@@ -294,17 +313,9 @@ scene("game", ({ levelId, coins }) => {
                 "D",
             ],
             "d": () => [
-                sprite("steel"),
-                area({scale: 0.1}),
-                anchor("bot"),
                 pos(),
-                body({isStatic: true}),
-                opacity(0),
-                offscreen({hide: true, distance: 64}),
-                "path",
-                "pathD",
-                "D",
-            ],
+                "D","pathDPosition"
+                ],
             "L": () => [
                 text("Level " + (levelId+1)),
                 pos(),
@@ -314,6 +325,15 @@ scene("game", ({ levelId, coins }) => {
                 "levelText",
                 anchor("center"),
             ],
+            // pushable blocks
+            "_": () => [
+                sprite("crate"),
+                area(),
+                body(),
+                anchor("bot"),
+                pos(),
+                "crate", "pushable",
+            ]
 
         },
     });
@@ -329,6 +349,7 @@ scene("game", ({ levelId, coins }) => {
         } 
         if (player1.locked && !player1.dead && !player2.dead) {
             player1.locked = false;
+            player1.opacity = 1;
         }
     });
     onKeyDown("left", () => {
@@ -349,6 +370,7 @@ scene("game", ({ levelId, coins }) => {
         }
         if (player2.locked && !player1.dead && !player2.dead) {
             player2.locked = false;
+            player2.opacity = 1;
         }
     });
     onKeyDown("a", () => {
@@ -398,10 +420,10 @@ scene("game", ({ levelId, coins }) => {
                 debug.log("You couldn't stick together!");
                 player1.dead = true; player1.locked = true;
                 player2.dead = true; player2.locked = true;
+                play("vine-boom");
                 wait(2, () => {
                     go("lose");
                 })
-                
             }
             warnLoop.cancel();
         })
@@ -422,18 +444,17 @@ scene("game", ({ levelId, coins }) => {
         level.get("doorA").forEach(destroy);
     })
     onCollide("player", "buttonB", () => {
-        level.get("pathB").forEach(door => {
-            door.opacity = 1;
-            door.area.scale = 1;
+        level.get("pathBPosition").forEach(path => {
+            debug.log("Making pathB at " + path.pos);
+            makePath(path.pos, "pathB");
         });
     })
     onCollide("player", "buttonC", () => {
         level.get("doorC").forEach(destroy);
     })
     onCollide("player", "buttonD", () => {
-        level.get("pathD").forEach(door => {
-            door.opacity = 1;
-            door.area.scale = 1;
+        level.get("pathDPosition").forEach(path => {
+            makePath(path.pos, "pathD")
         });
     })
     onCollide("player", "coin", (player, coin) => {
@@ -448,16 +469,6 @@ scene("game", ({ levelId, coins }) => {
         if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
             restart(levelId, coins)
         }
-        if (player1.locked) {
-            player1.opacity = 0;
-        } else {
-            player1.opacity = 1;
-        }
-        if (player2.locked) {
-            player2.opacity = 0;
-        } else {
-            player2.opacity = 1;
-        }
     })
     
     // Enter the next level on portal
@@ -466,6 +477,7 @@ scene("game", ({ levelId, coins }) => {
         play("portal");
         player.portal = true;
         player.locked = true;
+        player.opacity = 0;
         player.area.scale = 0.1;
         if (player1.portal && player2.portal) {
             if (levelId < LEVELS.length - 1) {
