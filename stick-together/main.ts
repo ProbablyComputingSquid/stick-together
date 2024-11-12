@@ -10,7 +10,7 @@ kaplay();
 // Load assets
 // after further discovery, you have to update the url below every time new assets get added
 // I will try to find a way to automate this
-const hash = "01efec970aa9f627857d24b4e651d0eb7dba96a8"
+const hash = "395febc39f78f5ef608a604951e84e87a454dafc"
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
@@ -40,10 +40,10 @@ const SPEED = 380;
 const LEVELS = [
     // test level
     [
-        " L     a       c",
-        "    $  a       c         ",
-        " O@ ^ Aa B   C c D     >",
-        "==========bb======ddddd==",
+        " L        a       c         ",
+        "       $  a       c         ",
+        " O@ _  ^ Aa B   C c D    >  ",
+        "=============bb======ddd====",
     ],
     // tutorial
     [
@@ -126,8 +126,26 @@ const LEVELS = [
         "L    =               -                        =               =",
         "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A=",
         "===============================================================",
-    ]
-];
+    ],
+    // the stairs
+    [
+        "            =====================================",
+        "           =                                    =",
+        "          =               _    _   ^          C =",
+        "         =               ==   === ===  =  =$$====",
+        "        =            B  =                  $$   =",
+        "       =            ^=^^=                  $$   =     ",
+        "      =aaaaaa  bbbb======                  $$   =   ",
+        "    ==      a  ^^^=                        $$   =   ",
+        "   =        a =====                        $$   =",
+        "  = A       ==    c                        $$   =",
+        "==  =      ===    c                  $     $$   =",
+        "=          ===  > c                  =     $$   =",    
+        "=L      ===========                  ==         =",
+        "=O@     =$$$$$$$$$---===^^^^^^^^^^^^^===   ^^   =",
+        "=================================================",
+    ],
+]
 
 let totalCoins = 0;
 for (const level of LEVELS) {
@@ -138,6 +156,7 @@ for (const level of LEVELS) {
 
     
 function restart(levelId: number, coins: number) {
+    play("vine-boom");
     go("game", {
         levelId: levelId,
         coins: coins,
@@ -231,6 +250,7 @@ scene("game", ({ levelId, coins }) => {
                 area({
                     scale: 0.75,
                 }),
+                body({isStatic: true}),
                 anchor("bot"),
                 "danger",
                 offscreen({ hide: true, distance: 64 }),
@@ -524,7 +544,7 @@ scene("win", ({ coins }) => {
 
 function start() {
     go("game", {
-        levelId: 0,
+        levelId: 8,
         coins: 0,
     });
 }
