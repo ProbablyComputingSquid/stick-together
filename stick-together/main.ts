@@ -42,7 +42,7 @@ const LEVELS = [
     [
         " L        a       c         ",
         "       $  a       c         ",
-        " O@ _  ^ Aa B   C c D    >  ",
+        " O@ _  ^  aAB   C c D    >  ",
         "=============bb======ddd====",
     ],
     // tutorial
@@ -129,25 +129,28 @@ const LEVELS = [
     ],
     // the stairs
     [
-        "            =====================================",
+        "                                =================",
+        "            =====================               =",
         "           =                                    =",
-        "          =               _    _   ^          C =",
-        "         =               ==   === ===  =  =$$====",
+        "          =               _    _    ^         C =",
+        "         =               ==   ===  ===    =$$====",
         "        =            B  =                  $$   =",
         "       =            ^=^^=                  $$   =     ",
-        "      =aaaaaa  bbbb======                  $$   =   ",
-        "    ==      a  ^^^=                        $$   =   ",
+        "      =aaaaaa bbbbb======                  $$   =   ",
+        "    ==   b  a ^^^^=                        $$   =   ",
         "   =        a =====                        $$   =",
         "  = A       ==    c                        $$   =",
         "==  =      ===    c                  $     $$   =",
-        "=          ===  > c                  =     $$   =",    
-        "=L      ===========                  ==         =",
+        "=    L     ===  > c                  =     $$   =",    
+        "=       ===========                  ==         =",
         "=O@     =$$$$$$$$$---===^^^^^^^^^^^^^===   ^^   =",
         "=================================================",
     ],
 ]
 
 let totalCoins = 0;
+let touchingSpikes = false;
+
 for (const level of LEVELS) {
     for (const row of level) {
         totalCoins += (row.match(/\$/g) || []).length;
@@ -162,6 +165,7 @@ function restart(levelId: number, coins: number) {
         coins: coins,
     });
 }
+
 
 function makePath(position, name) {
     if (name == "pathB") {
@@ -363,60 +367,82 @@ scene("game", ({ levelId, coins }) => {
     const player2 = level.get("player2")[0];
     debug.log("level: " + levelId)
     // Movements
-    onKeyPress("up", () => {
-        if (player1.isGrounded() && !player1.locked ) {
-            player1.jump();
-        } 
+    const upKeyListener = onKeyPress("up", () => {
         if (player1.locked && !player1.dead && !player2.dead) {
             player1.locked = false;
             player1.opacity = 1;
+            return;
+        } 
+        if (player1.isGrounded()) {
+            player1.jump();
+        } else if (!player1.isGrounded()) {
+            const jumpTimer = add([
+                timer(),
+            ])
+            jumpTimer.onUpdate(()=> {
+                if (player1.isGrounded() && isKeyDown("up")) {
+                    destroy(jumpTimer);
+                    player1.jump();
+                } else if (player1.isGrounded() && !isKeyDown("up")) {
+                    destroy(jumpTimer);
+                }
+            })
         }
+        
     });
-    onKeyDown("left", () => {
+    const leftKeyListener = onKeyDown("left", () => {
         if (!player1.locked) {
             player1.move(-SPEED, 0);
             player1.flipX = true;
         }
     });
-    onKeyDown("right", () => {
+    const rightKeyListener = onKeyDown("right", () => {
         if (!player1.locked) {
             player1.move(SPEED, 0);
             player1.flipX = false;
         }
     });
-    onKeyPress("w", () => {
-        if (player2.isGrounded() && !player2.locked) {
-            player2.jump();
-        }
+    const wKeyListener = onKeyPress("w", () => {
         if (player2.locked && !player1.dead && !player2.dead) {
             player2.locked = false;
             player2.opacity = 1;
+            return;
+        } 
+        if (player2.isGrounded()) {
+            player2.jump();
+        } else if (!player2.isGrounded()) {
+            const jumpTimer = add([
+                timer(),
+            ])
+            jumpTimer.onUpdate(()=> {
+                if (player2.isGrounded() && isKeyDown("up")) {
+                    destroy(jumpTimer);
+                    player2.jump();
+                } else if (player2.isGrounded() && !isKeyDown("up")) {
+                    destroy(jumpTimer);
+                }
+            })
         }
+        
     });
-    onKeyDown("a", () => {
+    const aKeyListener = onKeyDown("a", () => {
         if (!player2.locked) {
             player2.move(-SPEED, 0);
             player2.flipX = true;
         }
     });
-    onKeyDown("d", () => {
+    const dKeyListener = onKeyDown("d", () => {
         if (!player2.locked) {
             player2.move(SPEED, 0);
             player2.flipX = false;
         }
     });
-    player1.onUpdate(() => {
-        if (player1.locked) {
-            camPos(player2.pos);
-        } else {
-            camPos(player1.pos)
-        }
-    })
+
     let player2InViewport = true;
     
-    player2.onExitScreen(() => {
+    const playerExitScreenListener = player2.onExitScreen(() => {
         player2InViewport = false;
-        debug.log("Player 2 left the screen");
+        //debug.log("Player 2 left the screen");
         const warnText = add([
             text("Stick together!"),
             pos(center().x, center().y - 50),
@@ -435,9 +461,11 @@ scene("game", ({ levelId, coins }) => {
             if (player2InViewport) {warnLoop.cancel()}
         })
         wait(5, () => {
+            warnLoop.cancel();
+            warnText.destroy();
             if (!player2InViewport) {
                 shake(72);
-                debug.log("You couldn't stick together!");
+                //debug.log("You couldn't stick together!");
                 player1.dead = true; player1.locked = true;
                 player2.dead = true; player2.locked = true;
                 play("vine-boom");
@@ -445,39 +473,45 @@ scene("game", ({ levelId, coins }) => {
                     go("lose");
                 })
             }
-            warnLoop.cancel();
         })
     })
-    player2.onEnterScreen(() => {
+    const playerEnterScreenListener = player2.onEnterScreen(() => {
         player2InViewport = true;
-        debug.log("Player 2 entered the screen");
+        //debug.log("Player 2 entered the screen");
         destroyAll("warning");
     })
-    onCollide("player", "danger", () => {
+    const playerSpikeListener = onCollide("player", "danger", () => {
         play("vine-boom");
-        restart(levelId, coins);
+        if (!touchingSpikes) {
+            touchingSpikes = true;
+            wait(0.1, () => {
+                if (touchingSpikes) {
+                    touchingSpikes = false;
+                    restart(levelId, coins);
+                }
+            })
+        }
     })
-    onCollide("player", "button", (player, button) => {
+    const buttonListener = onCollide("player", "button", (player, button) => {
         destroy(button);
     })
-    onCollide("player", "buttonA", () => {
+    const buttonAListener = onCollide("player", "buttonA", () => {
         level.get("doorA").forEach(destroy);
     })
-    onCollide("player", "buttonB", () => {
+    const buttonBListener = onCollide("player", "buttonB", () => {
         level.get("pathBPosition").forEach(path => {
-            debug.log("Making pathB at " + path.pos);
             makePath(path.pos, "pathB");
         });
     })
-    onCollide("player", "buttonC", () => {
+    const buttonCListener = onCollide("player", "buttonC", () => {
         level.get("doorC").forEach(destroy);
     })
-    onCollide("player", "buttonD", () => {
+    const buttonDListener = onCollide("player", "buttonD", () => {
         level.get("pathDPosition").forEach(path => {
             makePath(path.pos, "pathD")
         });
     })
-    onCollide("player", "coin", (player, coin) => {
+    const coinListener = onCollide("player", "coin", (player, coin) => {
         destroy(coin);
         play("coins");
         coinsCollected++;
@@ -485,21 +519,29 @@ scene("game", ({ levelId, coins }) => {
     })
 
     // Fall death
-    player1.onUpdate(() => {
+    const playerOnUpdate = player1.onUpdate(() => {
         if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
             restart(levelId, coins)
+        }
+        if (player1.locked) {
+            camPos(player2.pos);
+        } else {
+            camPos(player1.pos)
         }
     })
     
     // Enter the next level on portal
 
-    onCollide("player", "portal", (player, portal) => {
+    const portalHandler = onCollide("player", "portal", (player, portal) => {
         play("portal");
         player.portal = true;
         player.locked = true;
         player.opacity = 0;
         player.area.scale = 0.1;
         if (player1.portal && player2.portal) {
+            // clean up level objects
+            cleanup();
+            // go to next level
             if (levelId < LEVELS.length - 1) {
                 go("game", {
                     levelId: levelId + 1,
@@ -517,7 +559,27 @@ scene("game", ({ levelId, coins }) => {
         outline(4, BLACK),
         pos(12),
         fixed(),
+        "coinsLabel",
     ]);
+    function cleanup() {
+        destroy(coinsLabel);
+        wKeyListener.cancel();
+        aKeyListener.cancel();
+        dKeyListener.cancel();
+        upKeyListener.cancel();
+        leftKeyListener.cancel();
+        rightKeyListener.cancel();
+        playerOnUpdate.cancel();
+        playerExitScreenListener.cancel();
+        playerEnterScreenListener.cancel();
+        playerSpikeListener.cancel();
+        buttonAListener.cancel();
+        buttonBListener.cancel();
+        buttonCListener.cancel();
+        buttonDListener.cancel();
+        coinListener.cancel();
+        buttonListener.cancel();
+    }
 });
 scene("lose", () => {
     add([
@@ -527,10 +589,10 @@ scene("lose", () => {
         anchor("center"),
         pos(center()),
     ]);
-    onKeyPress(start);
+    onKeyPress(() => {start()});
 })
 scene("win", ({ coins }) => {
-    add([
+    const winText = add([
         text(`You won!\nYou grabbed ${coins} out of ${totalCoins}coins!!!`, {
             width: width()
         }),
@@ -539,14 +601,17 @@ scene("win", ({ coins }) => {
         pos(width()/2, height()/2 - height()/4),
         anchor("center"),
     ]);
-    onKeyPress(start);
+    onKeyPress(() => {
+        destroy(winText);
+        start();
+    });
 });
 
-function start() {
+function start(levelId? : number) {
     go("game", {
-        levelId: 8,
+        levelId: levelId || 0,
         coins: 0,
     });
 }
 
-start();
+start(1);
