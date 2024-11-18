@@ -9,7 +9,9 @@ kaplay();
 // Load assets
 // after further discovery, you have to update the url below every time new assets get added
 // i will try to find a way to automate this
-const hash = "395febc39f78f5ef608a604951e84e87a454dafc"
+// so after some deliberation, I realized that changing this string to the sha-1 hash of the files would actually change the files, thus changing the hash, so it would create an infinite loop...
+const hash = "dd35cae654f235f5a0441b10cc5a62eb45cefac4";
+
 loadSprite("title-icon","https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png" )
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
@@ -31,8 +33,8 @@ loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
 loadSound("vine-boom", "/audio/vine-boom.mp3");
-loadMusic("stick-together", "/audio/music/stick_together.mp3");
-loadMusic("stick-together-2", "/audio/music/stick_together_2.mp3");
+loadSound("stick-together", "/audio/music/stick_together.mp3");
+loadSound("stick-together-2", "/audio/music/stick_together_2.mp3");
 loadMusic("stick-together-3", "/audio/music/stick_together_guys.mp3");
 loadMusic("stick-together-4", "audio/music/always_stick_together.mp3")
 
@@ -103,9 +105,9 @@ const LEVELS = [
     [
         "                                             $$$     $         ",
         "                                            =====              ",
-        " L                      ^   a                                  ",
-        "                        =   a        =   =                  >  ",
-        "O @   $   $     ^       a$$$=A               $$$    ^^^    === ",
+        " L                          a                                  ",
+        "                        ^   a        =   =                  >  ",
+        "O @   $   $     ^       =$$$=A               $$$    ^^^    === ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
     // the high jump
@@ -116,7 +118,7 @@ const LEVELS = [
         "        a          $ =             >        ",
         "       =a          =     b    b  =====   b  ",
         "L       a                                   ",
-        "        abbb   A  =  =            $$$  b    ",
+        "        abbbbbbA  =  =            $$$  b    ",
         "O @     a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
         "=============================================",
     ],
@@ -493,6 +495,7 @@ scene("game", ({ levelId, coins }) => {
             wait(0.1, () => {
                 if (touchingSpikes) {
                     touchingSpikes = false;
+                    levelMusic.stop();
                     restart(levelId, coins);
                 }
             })
@@ -528,6 +531,7 @@ scene("game", ({ levelId, coins }) => {
     // Fall death
     const playerOnUpdate = player1.onUpdate(() => {
         if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
+            levelMusic.stop();
             restart(levelId, coins)
         }
         if (player1.locked) {
@@ -617,6 +621,7 @@ scene("win", ({ coins }) => {
 });
 scene("title", () => {
     const title_music = play("stick-together", {loop:true});
+    title_music.play();
     const title_icon = add([
         sprite("title-icon"),
         pos(center().x, center().y - 100),
@@ -630,6 +635,11 @@ scene("title", () => {
         anchor("center"),
         color(BLACK),
     ])
+    
+    loop(0.625, async () => {
+        tween(title_icon.scale, vec2(0.6), 0.625, (p) => title_icon.scale = p, easings.easeInOutSine)
+            .then(() => tween(title_icon.scale, vec2(0.5), 0.625, (p) => title_icon.scale = p, easings.easeInOutSine))
+    })
     onKeyPress("space", async () => {
         destroy(space_text);
         title_music.stop();
