@@ -1,7 +1,6 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
-// Extend our game with multiple scenes
 
 // Start game
 kaplay();
@@ -9,7 +8,7 @@ kaplay();
 
 // Load assets
 // after further discovery, you have to update the url below every time new assets get added
-// I will try to find a way to automate this
+// i will try to find a way to automate this
 const hash = "395febc39f78f5ef608a604951e84e87a454dafc"
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
@@ -34,15 +33,16 @@ loadSound("vine-boom", "/audio/vine-boom.mp3");
 
 setGravity(1600);
 
+// player speed
 const SPEED = 380;
 
 // Levels
 const LEVELS = [
     // test level
     [
-        " L        a       c         ",
-        "       $  a       c         ",
-        " O@ _  ^  aAB   C c D    >  ",
+        " L        a       c     -   ",
+        "       $  a       c     -   ",
+        " O@ _  ^  aAB   C c D   - > ",
         "=============bb======ddd====",
     ],
     // tutorial
@@ -72,7 +72,7 @@ const LEVELS = [
         "=  $$$    =",
         "=  $ $    =",
         "=  ^^^    =",
-        "========  =",
+        "=======   =",
         "=        B=",
         "=   =======",
         "=   b   cc=",
@@ -117,15 +117,18 @@ const LEVELS = [
     ],
     // aMAZEng
     [
-        "                               $$=                            =",
-        " $    ==================     ^ $$=     ===================--===",
-        "==                  $$$=   =======    ==      $     =$$$$$  $$=",
-        " $    ======================     ====  =    ======  ======--===",
-        "==                         =  $$$                =          a>=",
-        "      ===============-     =  =================  ==============",
-        "L    =               -                        =               =",
-        "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A=",
-        "===============================================================",
+        "                                 ^                             =",
+        "                                 =                             =",
+        "                            $$   =                             =",
+        " $    ==================   ^$$ C =     ===================--====",
+        "==                  $$$=   =======    ==      $     =$$$$$  $$$=",
+        " $    ======================     ====  =    ======  ======--====",
+        "                           =           =         =  =       ac =",
+        "==                         =  $$$                =          ac>=",
+        "      ===============-     =  =================  ===============",
+        "L    =               -                        =                =",
+        "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A =",
+        "================================================================",
     ],
     // the stairs
     [
@@ -166,7 +169,7 @@ function restart(levelId: number, coins: number) {
     });
 }
 
-
+// makePath function creates a path block in certain positions
 function makePath(position, name) {
     if (name == "pathB") {
         return add([
@@ -176,7 +179,7 @@ function makePath(position, name) {
             pos(position),
             body({isStatic: true}),
             offscreen({hide: true, distance: 64}),
-            "path", "pathB","B",
+            "path","pathB","B",
         ])
     } else if (name == "pathD") {
         return add([
@@ -190,6 +193,7 @@ function makePath(position, name) {
         ])
     }
 }
+
 
 scene("game", ({ levelId, coins }) => {
 	let coinsCollected = 0;
@@ -206,8 +210,7 @@ scene("game", ({ levelId, coins }) => {
 				pos(),
                 opacity(1),
                 offscreen({hide: false, destroy: false}),
-                "player",
-                "player1",
+                "player", "player1", "green guy",
                 {
                     locked: false,
                     dead: false,
@@ -221,8 +224,7 @@ scene("game", ({ levelId, coins }) => {
 				pos(),
                 opacity(1),
                 offscreen({hide: false, destroy: false}),
-                "player",
-                "player2",
+                "player", "player2", "pinkish guy",
                 {
                     locked: false,
                     dead: false,
@@ -241,12 +243,14 @@ scene("game", ({ levelId, coins }) => {
                 area(),
                 anchor("bot"),
                 offscreen({hide: true, distance: 64}),
+                "fake grass",
+                "this grass is totally real, and definetly has a hitbox trust me bro",
             ],
             "$": () => [
                 sprite("coin"),
                 area(),
                 anchor("bot"),
-                "coin",
+                "coin", "money", "bling",
                 offscreen({ hide: true, distance: 64 }),
             ],
             "^": () => [
@@ -256,14 +260,14 @@ scene("game", ({ levelId, coins }) => {
                 }),
                 body({isStatic: true}),
                 anchor("bot"),
-                "danger",
+                "danger", "spike", "ouch", "only failures step on this",
                 offscreen({ hide: true, distance: 64 }),
             ],
             ">": () => [
                 sprite("portal"),
                 area(),
                 anchor("bot"),
-                "portal",
+                "portal", "beam me up, scotty",
                 offscreen({ hide: true, distance: 64 }),
             ],
             "A": () => [
@@ -273,9 +277,7 @@ scene("game", ({ levelId, coins }) => {
                 anchor("bot"),
                 pos(),
                 offscreen({hide: true, distance: 64}),
-                "button",
-                "buttonA",
-                "A",
+                "button", "buttonA", "A",
             ],
             "a": () => [
                 sprite("sand"),
@@ -284,9 +286,7 @@ scene("game", ({ levelId, coins }) => {
                 pos(),
                 body({isStatic: true}),
                 offscreen({hide: true, distance: 64}),
-                "door",
-                "doorA",
-                "A",
+                "door", "doorA", "A",
             ],
             "B": () => [
                 sprite("buttonB"),
@@ -295,9 +295,7 @@ scene("game", ({ levelId, coins }) => {
                 anchor("bot"),
                 pos(),
                 offscreen({hide: true, distance: 64}),
-                "button",
-                "buttonB",
-                "B",
+                "button", "buttonB", "B",
             ],
             "b": () => [
                 pos(),
@@ -310,9 +308,7 @@ scene("game", ({ levelId, coins }) => {
                 anchor("bot"),
                 pos(),
                 offscreen({hide: true, distance: 64}),
-                "button",
-                "buttonC",
-                "D",
+                "button","buttonC", "C",
             ],
             "c": () => [
                 sprite("snow"),
@@ -321,9 +317,7 @@ scene("game", ({ levelId, coins }) => {
                 pos(),
                 body({isStatic: true}),
                 offscreen({hide: true, distance: 64}),
-                "door",
-                "doorC",
-                "C",
+                "door", "doorC", "C",
             ],
             "D": () => [
                 sprite("buttonD"),
@@ -332,16 +326,14 @@ scene("game", ({ levelId, coins }) => {
                 anchor("bot"),
                 pos(),
                 offscreen({hide: true, distance: 64}),
-                "button",
-                "buttonD",
-                "D",
+                "button", "buttonD", "D",
             ],
             "d": () => [
                 pos(),
                 "D","pathDPosition"
-                ],
+            ],
             "L": () => [
-                text("Level " + (levelId+1)),
+                text("Level " + (levelId)),
                 pos(),
                 color(WHITE),
                 outline(32, BLACK),
@@ -356,21 +348,21 @@ scene("game", ({ levelId, coins }) => {
                 body(),
                 anchor("bot"),
                 pos(),
-                "crate", "pushable",
+                "crate", "pushable", "funny looking box"
             ]
-
         },
     });
 
     // Get the player object from tag
     const player1 = level.get("player1")[0];
     const player2 = level.get("player2")[0];
-    debug.log("level: " + levelId)
+    //debug.log("level: " + levelId);
     // Movements
     const upKeyListener = onKeyPress("up", () => {
         if (player1.locked && !player1.dead && !player2.dead) {
             player1.locked = false;
             player1.opacity = 1;
+            player1.area.scale = 1;
             return;
         } 
         if (player1.isGrounded()) {
@@ -406,6 +398,7 @@ scene("game", ({ levelId, coins }) => {
         if (player2.locked && !player1.dead && !player2.dead) {
             player2.locked = false;
             player2.opacity = 1;
+            player2.area.scale = 1;
             return;
         } 
         if (player2.isGrounded()) {
@@ -492,6 +485,7 @@ scene("game", ({ levelId, coins }) => {
             })
         }
     })
+    // button listeners
     const buttonListener = onCollide("player", "button", (player, button) => {
         destroy(button);
     })
@@ -579,6 +573,7 @@ scene("game", ({ levelId, coins }) => {
         buttonDListener.cancel();
         coinListener.cancel();
         buttonListener.cancel();
+        portalHandler.cancel();
     }
 });
 scene("lose", () => {
@@ -594,9 +589,9 @@ scene("lose", () => {
 scene("win", ({ coins }) => {
     const winText = add([
         text(`You won!\nYou grabbed ${coins} out of ${totalCoins}coins!!!`, {
-            width: width()
+            width: width()/2
         }),
-        scale(3),
+        scale(),
         color(BLACK),
         pos(width()/2, height()/2 - height()/4),
         anchor("center"),
@@ -614,4 +609,4 @@ function start(levelId? : number) {
     });
 }
 
-start(1);
+start();
