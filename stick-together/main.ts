@@ -10,6 +10,7 @@ kaplay();
 // after further discovery, you have to update the url below every time new assets get added
 // i will try to find a way to automate this
 const hash = "395febc39f78f5ef608a604951e84e87a454dafc"
+loadSprite("title-icon","https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png" )
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
@@ -601,12 +602,32 @@ scene("win", ({ coins }) => {
         start();
     });
 });
+scene("title", () => {
+    const title_icon = add([
+        sprite("title-icon"),
+        pos(center().x, center().y - 100),
+        anchor("center"),
+        scale(0.5),
+    ])
+
+    const space_text = add([
+        text("Press space to start"),
+        pos(center().x, center().y + 100),
+        anchor("center"),
+        color(BLACK),
+    ])
+    onKeyPress("space", async () => {
+        destroy(space_text);
+        await tween(title_icon.scale, vec2(0), 0.5, (p) => title_icon.scale = p, easings.easeOutBounce);
+        start();
+    });
+})
 
 function start(levelId? : number) {
     go("game", {
-        levelId: levelId || 0,
+        levelId: levelId || 1,
         coins: 0,
     });
 }
 
-start();
+go("title");
