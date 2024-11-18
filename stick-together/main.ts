@@ -31,6 +31,10 @@ loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
 loadSound("vine-boom", "/audio/vine-boom.mp3");
+loadMusic("stick-together", "/audio/music/stick_together.mp3");
+loadMusic("stick-together-2", "/audio/music/stick_together_2.mp3");
+loadMusic("stick-together-3", "/audio/music/stick_together_guys.mp3");
+loadMusic("stick-together-4", "audio/music/always_stick_together.mp3")
 
 setGravity(1600);
 
@@ -357,6 +361,14 @@ scene("game", ({ levelId, coins }) => {
     // Get the player object from tag
     const player1 = level.get("player1")[0];
     const player2 = level.get("player2")[0];
+
+    let levelMusic;
+    if (levelId < 5) {
+        levelMusic = play("stick-together-2", {loop:true});
+    } else if (levelId < 10) {
+        levelMusic = play("stick-together-3", {loop:true});
+    }
+    
     //debug.log("level: " + levelId);
     // Movements
     const upKeyListener = onKeyPress("up", () => {
@@ -575,6 +587,7 @@ scene("game", ({ levelId, coins }) => {
         coinListener.cancel();
         buttonListener.cancel();
         portalHandler.cancel();
+        levelMusic.stop();
     }
 });
 scene("lose", () => {
@@ -603,6 +616,7 @@ scene("win", ({ coins }) => {
     });
 });
 scene("title", () => {
+    const title_music = play("stick-together", {loop:true});
     const title_icon = add([
         sprite("title-icon"),
         pos(center().x, center().y - 100),
@@ -618,6 +632,7 @@ scene("title", () => {
     ])
     onKeyPress("space", async () => {
         destroy(space_text);
+        title_music.stop();
         await tween(title_icon.scale, vec2(0), 0.5, (p) => title_icon.scale = p, easings.easeOutBounce);
         start();
     });
