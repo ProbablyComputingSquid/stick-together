@@ -31,6 +31,7 @@ loadSprite("buttonB", "/sprites/buttonB.png");
 loadSprite("buttonC", "/sprites/buttonC.png");
 loadSprite("buttonD", "/sprites/buttonD.png");
 loadSprite("jumpy", "/sprites/jumpy.png");
+loadSprite("cloud", "/sprites/cloud.png");
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
@@ -394,7 +395,19 @@ scene("game", ({ levelId, coins }) => {
     });
     // add background
     setBackground(BLUE);
-
+    for (let i = 0; i < 10; i++) {
+        let zdistance = rand(0,1) * 4;
+        add([
+            sprite("cloud"),
+            pos(rand(vec2(0,0), vec2(width()/2, height()))),
+            move(0, 100 / zdistance),
+            scale(1 / zdistance),
+            offscreen({hide: true, distance: 64}),
+            anchor("topleft"),
+            "cloud",
+            z(-999 + zdistance),
+        ])
+    }
     // Get the player object from tag
     const player1 = level.get("player1")[0];
     const player2 = level.get("player2")[0];
@@ -631,6 +644,7 @@ scene("game", ({ levelId, coins }) => {
         portalHandler.cancel();
         jumpyListener.cancel();
         levelMusic.stop();
+        level.get("cloud").forEach(destroy);
     }
 });
 scene("lose", () => {
