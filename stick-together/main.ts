@@ -10,6 +10,7 @@ kaplay();
 // after further discovery, you have to update the url below every time new assets get added
 // i will try to find a way to automate this
 // so after some deliberation, I realized that changing this string to the sha-1 hash of the files would actually change the files, thus changing the hash, so it would create an infinite loop...
+
 const hash = "dd35cae654f235f5a0441b10cc5a62eb45cefac4";
 
 loadSprite("title-icon","https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png" )
@@ -29,6 +30,7 @@ loadSprite("button", "/sprites/button.png");
 loadSprite("buttonB", "/sprites/buttonB.png");
 loadSprite("buttonC", "/sprites/buttonC.png");
 loadSprite("buttonD", "/sprites/buttonD.png");
+loadSprite("jumpy", "/sprites/jumpy.png");
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
@@ -52,22 +54,31 @@ const LEVELS = [
         " O@ _  ^  aAB   C c D   - > ",
         "=============bb======ddd====",
     ],
+    // tech level -- are these jumps possible?
+    /*[
+        "                                 ",
+        "L         ====   =====   ======  ",
+        "    ===                          ",
+        "O@                              >",
+        "===== =====  =====   =====    ====",
+    ],*/
     // tutorial
     [
         "=  L              $                 =",
         "=@                $             >   =",
-        "=O  $    $    ^^  $  ^^  $$$ ^^===^^=",
+        "=O  $    $ U  ^^  $  ^^  $$$ ^^===^^=",
         "=====================================",
     ],
     // the broken bridge
 	[
-        "                      $$$$       ==",
-		"                 $$            > ==",
-		"       =    ==   ==   =  =    =====",
+        "                             a   == ",
+        "                      $$$$   a   ==",
+		"                 $$          a > ==",
+		"       =    ==   ==   =  =   a=====",
 		"L      =                        ===",
 		"   =   =                     $$$===",
-		"O@        ^^^  ^^^  ^^^  ^^^ $$$===",
-		"==================================",
+		"O@         ^^   ^^   ^^  ^^  $A$===",
+		"===================================",
 	],
     // the pit
     [
@@ -156,6 +167,20 @@ const LEVELS = [
         "=O@     =$$$$$$$$$---===^^^^^^^^^^^^^===   ^^   =",
         "=================================================",
     ],
+    // i need to find a good name for this level later
+    [
+        "  L                                                  ",
+        "  O@  _       _  =    _    ^^^                _      ",
+        "  =====bbbbbbb=====  ===  =====           =$ === $ === $=",
+        "= -                  = =   $$$            =$     $     $=",
+        "  -$                 = =            ^    d=$     $     $=",
+        "  =$$                =$=ddd   dd   d=d    =$     $     $=",
+        "  =$$$               =$=                  =$     $     $=",
+        "  ==$$$              =$=                  a$   c $ c   $=",
+        "  = =$$$          _  =$-                  a$   ccccc   $=",
+        "  =  =$$B^^^^^^^^^_  =$-D                 aA     >     C=",
+        "  =======================================================",
+    ],
 ]
 
 let totalCoins = 0;
@@ -217,7 +242,7 @@ scene("game", ({ levelId, coins }) => {
 				pos(),
                 opacity(1),
                 offscreen({hide: false, destroy: false}),
-                "player", "player1", "green guy",
+                "player", "player1", "green guy", "triggers button",
                 {
                     locked: false,
                     dead: false,
@@ -231,7 +256,7 @@ scene("game", ({ levelId, coins }) => {
 				pos(),
                 opacity(1),
                 offscreen({hide: false, destroy: false}),
-                "player", "player2", "pinkish guy",
+                "player", "player2", "pinkish guy", "triggers button",
                 {
                     locked: false,
                     dead: false,
@@ -263,7 +288,7 @@ scene("game", ({ levelId, coins }) => {
             "^": () => [
                 sprite("spike"),
                 area({
-                    scale: 0.75,
+                    scale: 0.5,
                 }),
                 body({isStatic: true}),
                 anchor("bot"),
@@ -355,10 +380,20 @@ scene("game", ({ levelId, coins }) => {
                 body(),
                 anchor("bot"),
                 pos(),
-                "crate", "pushable", "funny looking box"
+                "crate", "pushable", "funny looking box", "triggers button",
+            ],
+            "U": () => [
+                sprite("jumpy"),
+                area(),
+                body({isStatic: true}),
+                anchor("bot"),
+                pos(),
+                "jumpy", "trampoline", "bounce",
             ]
         },
     });
+    // add background
+    setBackground(BLUE);
 
     // Get the player object from tag
     const player1 = level.get("player1")[0];
@@ -445,6 +480,9 @@ scene("game", ({ levelId, coins }) => {
             player2.flipX = false;
         }
     });
+    const jumpyListener = onCollide("player", "trampoline", (player) => {
+        player.jump(1000);
+    });
 
     let player2InViewport = true;
     
@@ -471,7 +509,7 @@ scene("game", ({ levelId, coins }) => {
         wait(5, () => {
             warnLoop.cancel();
             warnText.destroy();
-            if (!player2InViewport) {
+            if (!player2InViewport && !player1.portal && !player2.portal) {
                 shake(72);
                 //debug.log("You couldn't stick together!");
                 player1.dead = true; player1.locked = true;
@@ -502,21 +540,21 @@ scene("game", ({ levelId, coins }) => {
         }
     })
     // button listeners
-    const buttonListener = onCollide("player", "button", (player, button) => {
+    const buttonListener = onCollide("triggers button", "button", (player, button) => {
         destroy(button);
     })
-    const buttonAListener = onCollide("player", "buttonA", () => {
+    const buttonAListener = onCollide("triggers button", "buttonA", () => {
         level.get("doorA").forEach(destroy);
     })
-    const buttonBListener = onCollide("player", "buttonB", () => {
+    const buttonBListener = onCollide("triggers button", "buttonB", () => {
         level.get("pathBPosition").forEach(path => {
             makePath(path.pos, "pathB");
         });
     })
-    const buttonCListener = onCollide("player", "buttonC", () => {
+    const buttonCListener = onCollide("triggers button", "buttonC", () => {
         level.get("doorC").forEach(destroy);
     })
-    const buttonDListener = onCollide("player", "buttonD", () => {
+    const buttonDListener = onCollide("triggers button", "buttonD", () => {
         level.get("pathDPosition").forEach(path => {
             makePath(path.pos, "pathD")
         });
@@ -541,8 +579,8 @@ scene("game", ({ levelId, coins }) => {
         }
     })
     
-    // Enter the next level on portal
 
+    // Enter the next level on portal
     const portalHandler = onCollide("player", "portal", (player, portal) => {
         play("portal");
         player.portal = true;
@@ -591,6 +629,7 @@ scene("game", ({ levelId, coins }) => {
         coinListener.cancel();
         buttonListener.cancel();
         portalHandler.cancel();
+        jumpyListener.cancel();
         levelMusic.stop();
     }
 });
@@ -606,11 +645,12 @@ scene("lose", () => {
 })
 scene("win", ({ coins }) => {
     const winText = add([
-        text(`You won!\nYou grabbed ${coins} out of ${totalCoins}coins!!!`, {
+        text(`You won!\nYou grabbed ${coins} out of ${totalCoins} coins!!!`, {
             width: width()/2
         }),
-        scale(),
-        color(BLACK),
+        scale(2),
+        color(WHITE),
+        outline(12, BLACK),
         pos(width()/2, height()/2 - height()/4),
         anchor("center"),
     ]);
@@ -655,4 +695,5 @@ function start(levelId? : number) {
     });
 }
 
-go("title");
+start(0);
+//go("title");
