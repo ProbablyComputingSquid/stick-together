@@ -45,15 +45,20 @@ setGravity(1600);
 
 // player speed
 const SPEED = 380;
+const JUMPFORCE = 700;
 
 // Levels
 const LEVELS = [
     // test level
     [
-        " L        a       c     -   ",
-        "       $  a       c     -   ",
-        " O@ _  ^  aAB   C c D   - > ",
-        "=============bb======ddd====",
+        "                              ",
+        "                              ",
+        "                              ",
+        "                              ",
+        " L        a       c           ",
+        "       $  a       c           ",
+        " O@ U  ^  aA B   C c D    _  > ",
+        "==============bb======dddd======",
     ],
     // tech level -- are these jumps possible?
     /*[
@@ -67,7 +72,7 @@ const LEVELS = [
     [
         "=  L              $                 =",
         "=@                $             >   =",
-        "=O  $    $ U  ^^  $  ^^  $$$ ^^===^^=",
+        "=O  $    $ U^^^^  $  ^^  $$$ ^^===^^=",
         "=====================================",
     ],
     // the broken bridge
@@ -97,7 +102,7 @@ const LEVELS = [
         "=   b   cc=",
         "=   b   c>=",
         "=   b   ===",
-        "=   b =   =",
+        "= U b =   =",
         "=^^^b    C=",
         "===========",
     ],
@@ -127,7 +132,7 @@ const LEVELS = [
         "                $B$                         ",
         "                ===                         ",
         "        a            $                      ",
-        "        a          $ =             >        ",
+        "        a   U      $ =             >        ",
         "       =a          =     b    b  =====   b  ",
         "L       a                                   ",
         "        abbbbbbA  =  =            $$$  b    ",
@@ -152,16 +157,16 @@ const LEVELS = [
     // the stairs
     [
         "                                =================",
-        "            =====================               =",
-        "           =                                    =",
-        "          =               _    _    ^         C =",
-        "         =               ==   ===  ===    =$$====",
-        "        =            B  =                  $$   =",
-        "       =            ^=^^=                  $$   =     ",
-        "      =aaaaaa bbbbb======                  $$   =   ",
-        "    ==   b  a ^^^^=                        $$   =   ",
+        "            =====================               -        $$$$",
+        "           =                                    -        $$$$",
+        "          =               _    _    ^         C -        $$$$",
+        "         =               ==   ===  ===    =$$====        ====",
+        "        =            B  =                  $$   =        ",
+        "       =            ^=^^=                  $$   =    U",
+        "      =aaaaaa bbbbb======                  $$   =",
+        "    ==   b  a ^^^^=                        $$   =",
         "   =        a =====                        $$   =",
-        "  = A       ==    c                        $$   =",
+        "  = A       ==    c            U           $$   =",
         "==  =      ===    c                  $     $$   =",
         "=    L     ===  > c                  =     $$   =",    
         "=       ===========                  ==         =",
@@ -251,7 +256,7 @@ scene("game", ({ levelId, coins }) => {
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
-        pos: vec2(-50,-50),
+        pos: vec2(0,0),
         tiles: {
             "@": () => [
                 sprite("bean"),
@@ -441,7 +446,7 @@ scene("game", ({ levelId, coins }) => {
             return;
         } 
         if (player1.isGrounded()) {
-            player1.jump();
+            player1.jump(JUMPFORCE);
         } else if (!player1.isGrounded()) {
             const jumpTimer = add([
                 timer(),
@@ -449,7 +454,7 @@ scene("game", ({ levelId, coins }) => {
             jumpTimer.onUpdate(()=> {
                 if (player1.isGrounded() && isKeyDown("up")) {
                     destroy(jumpTimer);
-                    player1.jump();
+                    player1.jump(JUMPFORCE);
                 } else if (player1.isGrounded() && !isKeyDown("up")) {
                     destroy(jumpTimer);
                 }
@@ -477,7 +482,7 @@ scene("game", ({ levelId, coins }) => {
             return;
         } 
         if (player2.isGrounded()) {
-            player2.jump();
+            player2.jump(JUMPFORCE);
         } else if (!player2.isGrounded()) {
             const jumpTimer = add([
                 timer(),
@@ -485,7 +490,7 @@ scene("game", ({ levelId, coins }) => {
             jumpTimer.onUpdate(()=> {
                 if (player2.isGrounded() && isKeyDown("up")) {
                     destroy(jumpTimer);
-                    player2.jump();
+                    player2.jump(JUMPFORCE);
                 } else if (player2.isGrounded() && !isKeyDown("up")) {
                     destroy(jumpTimer);
                 }
@@ -505,8 +510,20 @@ scene("game", ({ levelId, coins }) => {
             player2.flipX = false;
         }
     });
-    const jumpyListener = onCollide("player", "trampoline", (player) => {
-        player.jump(1000);
+    
+    const jumpyListener = onCollide("player1", "trampoline", (player) => {
+        if (isKeyDown("up")) {
+            player.jump(JUMPFORCE * 1.25);
+        } else {
+            player.jump(JUMPFORCE * 1.1);
+        }
+    });
+    const jumpy2Listener = onCollide("player2", "trampoline", (player) => {
+        if (isKeyDown("w")) {
+            player.jump(JUMPFORCE * 1.25);
+        } else {
+            player.jump(JUMPFORCE * 1.1);
+        }
     });
 
     let player2InViewport = true;
@@ -656,6 +673,7 @@ scene("game", ({ levelId, coins }) => {
         buttonListener.cancel();
         portalHandler.cancel();
         jumpyListener.cancel();
+        jumpy2Listener.cancel();
         levelMusic.stop();
         level.get("cloud").forEach(destroy);
     }
@@ -717,7 +735,7 @@ scene("title", () => {
 
 function start(levelId? : number) {
     go("game", {
-        levelId: levelId || 1,
+        levelId: levelId == null ? 1 : levelId,
         coins: 0,
     });
 }
