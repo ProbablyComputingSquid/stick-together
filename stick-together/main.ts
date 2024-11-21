@@ -227,13 +227,31 @@ function makePath(position, name) {
     }
 }
 
+function addCloud(cloudPos?) {
+    let zdistance = rand(0,1) * 3 + 1;
+    return add([
+        sprite("cloud"),
+        pos(cloudPos || rand(vec2(0,0), vec2(width()/2, height()))),
+        move(0, 100 / zdistance),
+        scale(1 / zdistance),
+        //area(),
+        offscreen({hide: true, distance: 640, destroy: true}),
+        anchor("topleft"),
+        "cloud",
+        z(-999 - Math.floor((zdistance * 10))),
+    ])
+}
+
+onDestroy("cloud", () => {
+    rand(0,1) > 0.6 ? addCloud() : null;
+})
 
 scene("game", ({ levelId, coins }) => {
 	let coinsCollected = 0;
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
-        pos: vec2(0,0),
+        pos: vec2(-50,-50),
         tiles: {
             "@": () => [
                 sprite("bean"),
@@ -369,7 +387,7 @@ scene("game", ({ levelId, coins }) => {
                 text("Level " + (levelId)),
                 pos(),
                 color(WHITE),
-                outline(32, BLACK),
+                outline(64, rgb(0,0,0)),
                 scale(2),
                 "levelText",
                 anchor("center"),
@@ -396,18 +414,12 @@ scene("game", ({ levelId, coins }) => {
     // add background
     setBackground(BLUE);
     for (let i = 0; i < 10; i++) {
-        let zdistance = rand(0,1) * 4;
-        add([
-            sprite("cloud"),
-            pos(rand(vec2(0,0), vec2(width()/2, height()))),
-            move(0, 100 / zdistance),
-            scale(1 / zdistance),
-            offscreen({hide: true, distance: 64}),
-            anchor("topleft"),
-            "cloud",
-            z(-999 + zdistance),
-        ])
+        addCloud();
     }
+    const cloudLoop = loop(3, () => {
+        let cloudPos = rand(vec2(-width()/2,-height()/2), vec2(width()/2, height()/2));
+        addCloud(cloudPos);
+    })
     // Get the player object from tag
     const player1 = level.get("player1")[0];
     const player2 = level.get("player2")[0];
@@ -625,6 +637,7 @@ scene("game", ({ levelId, coins }) => {
     ]);
     function cleanup() {
         destroy(coinsLabel);
+        cloudLoop.cancel();
         wKeyListener.cancel();
         aKeyListener.cancel();
         dKeyListener.cancel();
