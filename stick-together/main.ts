@@ -70,10 +70,11 @@ const LEVELS = [
     ],*/
     // tutorial
     [
-        "=  L              $                 =",
-        "=@                $             >   =",
-        "=O  $    $ U^^^^  $  ^^  $$$ ^^===^^=",
-        "=====================================",
+        "                      $$$            =",
+        "=  L               $  ===            =",
+        "=@                 $             >   =",
+        "=O  $  $  $ U^^^^  $   ^  $$$ ^^===^^=",
+        "======================================",
     ],
     // the broken bridge
 	[
@@ -88,23 +89,23 @@ const LEVELS = [
 	],
     // the pit
     [
-        "L          ",
-        "O@ $$$    A",
-        "===aaa=====",
-        "=  $$$    =",
-        "=  $$$    =",
-        "=  $$$    =",
-        "=  $ $    =",
-        "=  ^^^    =",
-        "=======   =",
-        "=        B=",
-        "=   =======",
-        "=   b   cc=",
-        "=   b   c>=",
-        "=   b   ===",
-        "= U b =   =",
-        "=^^^b    C=",
-        "===========",
+        "L            ",
+        "O@ $$$ ^^^  A",
+        "===aaa=======",
+        "=  $$$      =",
+        "=  $$$      =",
+        "=  $$$   $  =",
+        "=  $ $   $  =",
+        "=  ^^^   $  =",
+        "=======     =",
+        "=        B  =",
+        "=     =======",
+        "=     b   cc=",
+        "=     b   c>=",
+        "=  U  b   ===",
+        "=     b =   =",
+        "=^^^^^b    C=",
+        "=============",
     ],
     // the box
     [
@@ -422,7 +423,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "d": () => [
                 pos(),
-                "D","pathDPosition"
+                "D","pathDPosition",
             ],
             "L": () => [
                 text("Level " + (levelId)),
@@ -436,7 +437,7 @@ scene("game", ({ levelId, coins }) => {
             // pushable blocks
             "_": () => [
                 sprite("crate"),
-                area(),
+                area({collisionIgnore: ["spikes"]}),
                 body(),
                 anchor("bot"),
                 pos(),
@@ -647,8 +648,9 @@ scene("game", ({ levelId, coins }) => {
         buttonCListener2.cancel();
     });*/
     const buttonDListener = onCollide( "buttonD","triggers button", (button) => {
-        button.scale = vec2(1,0.5);
-        get("pathDPosition").forEach(path => {
+        destroy(button);
+        level.get("pathDPosition").forEach(path => {
+            debug.log("here!");
             makeBlock(path.pos, "pathD")
         });
     })
@@ -799,5 +801,5 @@ function start(levelId? : number) {
     });
 }
 
-//start(0);
-go("title");
+start(1);
+//go("title");
