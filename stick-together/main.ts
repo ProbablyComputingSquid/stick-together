@@ -1,4 +1,4 @@
-import kaplay from "kaplay";
+import kaplay, { AreaComp } from "kaplay";
 import "kaplay/global";
 
 
@@ -51,14 +51,14 @@ const JUMPFORCE = 700;
 const LEVELS = [
     // test level
     [
-        "                              ",
-        "                              ",
-        "                              ",
-        "                              ",
-        " L        a       c           ",
-        "       $  a       c           ",
-        " O@ U  ^  aA B   C c D    _  > ",
-        "==============bb======dddd======",
+        "                                     ",
+        "     =====                           ",
+        "      VVV         ====               ",
+        "                                     ",
+        " L        a        c                  ",
+        "       $  a        c           =      ",
+        "O@  U  ^  aA B   C c D    _ ^^^U^^^     > ",
+        "==============bb======dddd=================",
     ],
     // tech level -- are these jumps possible?
     /*[
@@ -139,6 +139,22 @@ const LEVELS = [
         "O @     a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
         "=============================================",
     ],
+    // boing
+    [
+        "                                                       ",
+        "                                                     a ",
+        "  @ O                                  U    =ddddddd===",
+        "======   $     $     $ ^^^ $ ^^^ $                     ",
+        "=    a   $     $     $ === $ === $  U                  ",
+        "=    a   $     $ ^^^ $     $ VVV $                     ",
+        "=    a   $     $ === $     $     $                     ",
+        "=    a   U     U     U     U     U                     ",
+        "=    a                                                 ",
+        "=    a                                                 ",
+        "=    a                              U                  ",
+        "=  > a                                               D ",
+        "======                                 u            ===",
+    ],
     // aMAZEng
     [
         "                                 ^                             =",
@@ -207,8 +223,8 @@ function restart(levelId: number, coins: number) {
     });
 }
 
-// makePath function creates a path block in certain positions
-function makePath(position, name) {
+// makeBlock function creates a path block in certain positions
+function makeBlock(position, name) {
     if (name == "pathB") {
         return add([
             sprite("grass"),
@@ -228,6 +244,16 @@ function makePath(position, name) {
             body({isStatic: true}),
             offscreen({hide: true, distance: 64}),
             "path","pathD","D",
+        ])
+    } else if (name == "doorC") {
+        return add([
+            sprite("snow"),
+            area(),
+            anchor("bot"),
+            pos(position),
+            body({isStatic: true}),
+            offscreen({hide: true, distance: 64}),
+            "door", "doorC", "C",
         ])
     }
 }
@@ -319,6 +345,17 @@ scene("game", ({ levelId, coins }) => {
                 "danger", "spike", "ouch", "only failures step on this",
                 offscreen({ hide: true, distance: 64 }),
             ],
+            "V": () => [
+                sprite("spike", {flipY: true}),
+                area({
+                    scale: 0.5,
+                }),
+                pos(0,-64),
+                body({isStatic: true}),
+                anchor("top"),
+                "danger", "spike", "ouch", "only failures step on this",
+                offscreen({ hide: true, distance: 64 }),
+            ],
             ">": () => [
                 sprite("portal"),
                 area(),
@@ -329,7 +366,7 @@ scene("game", ({ levelId, coins }) => {
             "A": () => [
                 sprite("button"),
                 area(),
-                body(),
+                body({isStatic: true}),
                 anchor("bot"),
                 pos(),
                 offscreen({hide: true, distance: 64}),
@@ -347,7 +384,7 @@ scene("game", ({ levelId, coins }) => {
             "B": () => [
                 sprite("buttonB"),
                 area(),
-                body(),
+                body({isStatic: true}),
                 anchor("bot"),
                 pos(),
                 offscreen({hide: true, distance: 64}),
@@ -360,27 +397,26 @@ scene("game", ({ levelId, coins }) => {
             "C": () => [
                 sprite("buttonC"),
                 area(),
-                body(),
+                body({isStatic: true}),
                 anchor("bot"),
                 pos(),
+                scale(),
+                timer(),
                 offscreen({hide: true, distance: 64}),
                 "button","buttonC", "C",
             ],
             "c": () => [
-                sprite("snow"),
-                area(),
-                anchor("bot"),
                 pos(),
-                body({isStatic: true}),
-                offscreen({hide: true, distance: 64}),
-                "door", "doorC", "C",
+                "C","doorCPosition",
             ],
             "D": () => [
                 sprite("buttonD"),
                 area(),
-                body(),
+                body({isStatic: true}),
                 anchor("bot"),
                 pos(),
+                scale(),
+                timer(),
                 offscreen({hide: true, distance: 64}),
                 "button", "buttonD", "D",
             ],
@@ -417,10 +453,12 @@ scene("game", ({ levelId, coins }) => {
         },
     });
     // add background
-    setBackground(BLUE);
+    setBackground(rgb(123,193,250));
+    // add some starting clouds
     for (let i = 0; i < 10; i++) {
         addCloud();
     }
+    // spawn a cloud every three seconds
     const cloudLoop = loop(3, () => {
         let cloudPos = rand(vec2(-width()/2,-height()/2), vec2(width()/2, height()/2));
         addCloud(cloudPos);
@@ -436,6 +474,10 @@ scene("game", ({ levelId, coins }) => {
         levelMusic = play("stick-together-3", {loop:true});
     }
     
+    // spawn doors in
+    level.get("doorCPosition").forEach(door => {
+        makeBlock(door.pos, "doorC");
+    });
     //debug.log("level: " + levelId);
     // Movements
     const upKeyListener = onKeyPress("up", () => {
@@ -582,25 +624,41 @@ scene("game", ({ levelId, coins }) => {
         }
     })
     // button listeners
-    const buttonListener = onCollide("triggers button", "button", (player, button) => {
+    const buttonAListener = onCollide("buttonA","triggers button", (button) => {
+        level.get("doorA").forEach(destroy);
         destroy(button);
     })
-    const buttonAListener = onCollide("triggers button", "buttonA", () => {
-        level.get("doorA").forEach(destroy);
-    })
-    const buttonBListener = onCollide("triggers button", "buttonB", () => {
+    const buttonBListener = onCollide( "buttonB","triggers button", (button) => {
         level.get("pathBPosition").forEach(path => {
-            makePath(path.pos, "pathB");
+            makeBlock(path.pos, "pathB");
+        });
+        destroy(button);
+    })
+    const buttonCListener = onCollide("buttonC","triggers button", (button) => {
+        get("doorC").forEach(destroy);
+        destroy(button);
+    })
+    /*
+    const buttonCListener2 = onCollideEnd("buttonC","triggers button", (button) => {
+        button.scale = vec2(1,1);
+        level.get("doorCPosition").forEach(door => {
+            makeBlock(door.pos, "doorC");
+        });
+        buttonCListener2.cancel();
+    });*/
+    const buttonDListener = onCollide( "buttonD","triggers button", (button) => {
+        button.scale = vec2(1,0.5);
+        get("pathDPosition").forEach(path => {
+            makeBlock(path.pos, "pathD")
         });
     })
-    const buttonCListener = onCollide("triggers button", "buttonC", () => {
-        level.get("doorC").forEach(destroy);
-    })
-    const buttonDListener = onCollide("triggers button", "buttonD", () => {
-        level.get("pathDPosition").forEach(path => {
-            makePath(path.pos, "pathD")
-        });
-    })
+    /*
+    const buttonDListener2 = onCollideEnd( "buttonD","triggers button", (button) => {
+        button.scale = vec2(1,1);
+        level.get("pathD").forEach(destroy);
+        buttonDListener2.cancel();
+    });*/
+    
     const coinListener = onCollide("player", "coin", (player, coin) => {
         destroy(coin);
         play("coins");
@@ -609,7 +667,7 @@ scene("game", ({ levelId, coins }) => {
     })
 
     // Fall death
-    const playerOnUpdate = player1.onUpdate(() => {
+    const playerOnUpdate = onUpdate(() => {
         if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
             levelMusic.stop();
             restart(levelId, coins)
@@ -668,9 +726,10 @@ scene("game", ({ levelId, coins }) => {
         buttonAListener.cancel();
         buttonBListener.cancel();
         buttonCListener.cancel();
+        //buttonCListener2.cancel();
         buttonDListener.cancel();
+        //buttonDListener2.cancel();
         coinListener.cancel();
-        buttonListener.cancel();
         portalHandler.cancel();
         jumpyListener.cancel();
         jumpy2Listener.cancel();
@@ -740,5 +799,5 @@ function start(levelId? : number) {
     });
 }
 
-start(0);
-//go("title");
+//start(0);
+go("title");
