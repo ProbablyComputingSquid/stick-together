@@ -47,7 +47,18 @@ setGravity(1600);
 const SPEED = 380;
 const JUMPFORCE = 700;
 
-// Levels
+/*
+Level 1: tested, easy, works
+Level 2, tested, repeated spike jumps are annoying, but it works
+Level 3, tested, the spike fall is mean, but it works
+Level 4, tested, needs more gimmicks 
+Level 5, tested, works, teaches some important mechanics. It needs another gimmick though
+Level 6, tested, but it might be confusing how to get up to the top. add a sign of some sort?
+Level 7, semitested, works, the jumps are tight, and the final part needs more gimmicks
+Level 8, untested, the maze is a bit confusing
+Level 9, untested, the stairs are also a bit confusing
+Level 10, untested, final level, needs to be epic
+*/ 
 const LEVELS = [
     // test level
     [
@@ -90,16 +101,16 @@ const LEVELS = [
     // the pit
     [
         "L            ",
-        "O@ $$$ ^^^  A",
-        "===aaa=======",
-        "=  $$$      =",
-        "=  $$$      =",
-        "=  $$$   $  =",
-        "=  $ $   $  =",
-        "=  ^^^   $  =",
+        "O@$$$ ^^^  A",
+        "==aaa========",
+        "= $$$       =",
+        "= $$$       =",
+        "= $$$    $  =",
+        "= $ $    $  =",
+        "= ^^^    $  =",
         "=======     =",
-        "=        B  =",
-        "=     =======",
+        "= VVV    B  =",
+        "=     b======",
         "=     b   cc=",
         "=     b   c>=",
         "=  U  b   ===",
@@ -143,30 +154,31 @@ const LEVELS = [
     // boing
     [
         "                                                       ",
-        "                                                     a ",
-        "  @ O                                  U    =ddddddd===",
-        "======   $     $     $ ^^^ $ ^^^ $                     ",
-        "=    a   $     $     $ === $ === $  U                  ",
-        "=    a   $     $ ^^^ $     $ VVV $                     ",
+        "  L                                                  a ",
+        "  @ O                        ===       U    =ddddddd===",
+        "======   $     $     $  ^  $ VVV $                     ",
+        "=    a   $     $     $  =  $     $  U                  ",
+        "=    a   $     $ ^^^ $     $     $                     ",
         "=    a   $     $ === $     $     $                     ",
         "=    a   U     U     U     U     U                     ",
         "=    a                                                 ",
         "=    a                                                 ",
         "=    a                              U                  ",
         "=  > a                                               D ",
-        "======                                 u            ===",
+        "======                                 U       UUU  ===",
     ],
     // aMAZEng
     [
         "                                 ^                             =",
-        "                                 =                             =",
-        "                            $$   =                             =",
-        " $    ==================   ^$$ C =     ===================--====",
-        "==                  $$$=   =======    ==      $     =$$$$$  $$$=",
-        " $    ======================     ====  =    ======  ======--====",
-        "                           =           =         =  =       ac =",
-        "==                         =  $$$                =          ac>=",
-        "      ===============-     =  =================  ===============",
+        "                                 =                           $ =",
+        "                            $$   =                           D =",
+        " $    ==================   ^$$ C =     ==================---====",
+        "==                  $$$=   =======    ==  V   $     =$$$$$$$$$$=",
+        " $    ======================     ===   =     =====  =          =",
+        "        V   V   V   V      =           =  U      =  ====----====",
+        "                           =           =         =          ac =",
+        "==        ^   ^   ^        =  $$$                =          ac>=",
+        "      ===============-     =  =================  ======ddddd====",
         "L    =               -                        =                =",
         "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A =",
         "================================================================",
@@ -384,7 +396,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "B": () => [
                 sprite("buttonB"),
-                area(),
+                area({scale:vec2(0.5,1)}),
                 body({isStatic: true}),
                 anchor("bot"),
                 pos(),
@@ -397,7 +409,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "C": () => [
                 sprite("buttonC"),
-                area(),
+                area({scale:vec2(0.5,1)}),
                 body({isStatic: true}),
                 anchor("bot"),
                 pos(),
@@ -412,7 +424,7 @@ scene("game", ({ levelId, coins }) => {
             ],
             "D": () => [
                 sprite("buttonD"),
-                area(),
+                area({scale:vec2(0.5,1)}),
                 body({isStatic: true}),
                 anchor("bot"),
                 pos(),
@@ -482,10 +494,12 @@ scene("game", ({ levelId, coins }) => {
     //debug.log("level: " + levelId);
     // Movements
     const upKeyListener = onKeyPress("up", () => {
-        if (player1.locked && !player1.dead && !player2.dead) {
+        if (player1.locked && player1.portal && !player1.dead && !player2.dead) {
             player1.locked = false;
             player1.opacity = 1;
             player1.area.scale = 1;
+            player1.jump(JUMPFORCE);
+            player1.portal = false; 
             return;
         } 
         if (player1.isGrounded()) {
@@ -518,10 +532,12 @@ scene("game", ({ levelId, coins }) => {
         }
     });
     const wKeyListener = onKeyPress("w", () => {
-        if (player2.locked && !player1.dead && !player2.dead) {
+        if (player2.locked && player2.portal && !player1.dead && !player2.dead) {
             player2.locked = false;
             player2.opacity = 1;
             player2.area.scale = 1;
+            player2.jump(JUMPFORCE);
+            player2.portal = false;
             return;
         } 
         if (player2.isGrounded()) {
