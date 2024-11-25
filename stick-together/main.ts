@@ -1,4 +1,4 @@
-import kaplay, { AreaComp } from "kaplay";
+import kaplay, { AreaComp, Vec2 } from "kaplay";
 import "kaplay/global";
 
 
@@ -8,10 +8,10 @@ kaplay();
 
 // Load assets
 // after further discovery, you have to update the url below every time new assets get added
-// i will try to find a way to automate this
+// I will try to find a way to automate this
 // so after some deliberation, I realized that changing this string to the sha-1 hash of the files would actually change the files, thus changing the hash, so it would create an infinite loop...
 
-const hash = "dd35cae654f235f5a0441b10cc5a62eb45cefac4";
+const hash = "6641bc2860a8e4ecbf0f1b2dbc3ca6020668cb50";
 
 loadSprite("title-icon","https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png" )
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
@@ -32,6 +32,7 @@ loadSprite("buttonC", "/sprites/buttonC.png");
 loadSprite("buttonD", "/sprites/buttonD.png");
 loadSprite("jumpy", "/sprites/jumpy.png");
 loadSprite("cloud", "/sprites/cloud.png");
+loadSprite("sign", "sprites/sign.png");
 loadSound("coins", "/audio/coin.mp3");
 loadSound("portal", "/audio/portal.mp3");
 loadSound("alarm", "/audio/alarm.mp3");
@@ -40,6 +41,7 @@ loadSound("stick-together", "/audio/music/stick_together.mp3");
 loadSound("stick-together-2", "/audio/music/stick_together_2.mp3");
 loadMusic("stick-together-3", "/audio/music/stick_together_guys.mp3");
 loadMusic("stick-together-4", "audio/music/always_stick_together.mp3")
+
 
 setGravity(1600);
 
@@ -62,14 +64,14 @@ Level 10, untested, final level, needs to be epic
 const LEVELS = [
     // test level
     [
-        "                                     ",
-        "     =====                           ",
-        "      VVV         ====               ",
-        "                                     ",
-        " L        a        c                  ",
-        "       $  a        c           =      ",
-        "O@  U  ^  aA B   C c D    _ ^^^U^^^     > ",
-        "==============bb======dddd=================",
+        "                                           ",
+        "           =====                           ",
+        "            VVV         ====               ",
+        "                                           ",
+        " L              a        c                  ",
+        "             $  a        c           =      ",
+        "O@  S  S  U  ^  aA B   C c D    _ ^^^U^^^     > ",
+        "====================bb======dddd======================",
     ],
     // tech level -- are these jumps possible?
     /*[
@@ -202,7 +204,7 @@ const LEVELS = [
         "=O@     =$$$$$$$$$---===^^^^^^^^^^^^^===   ^^   =",
         "=================================================",
     ],
-    // i need to find a good name for this level later
+    // I need to find a good name for this level later
     [
         "  L                                                  ",
         "  O@  _       _  =    _    ^^^                _      ",
@@ -290,8 +292,36 @@ onDestroy("cloud", () => {
     rand(0,1) > 0.6 ? addCloud() : null;
 })
 
+// dialogue 
+const dialogues = [
+    "Welcome to stick together!",
+    "sign 2",
+]
+let talking = false;
+function showDialogue(sign, signID) {
+    talking = false;
+    const dialogueBox = add([
+        rect(64*3, 64*2),
+        color(0,0,0),
+        opacity(0.7),
+        pos(sign.pos.sub(vec2(64*1.5,64*3))),
+        z(3),
+        "dialogue",
+    ])
+    //debug.log(signID);
+    const dialogueText = add([
+        text(dialogues[signID], {size:16, width: 64*3}),
+        pos(sign.pos.add(vec2(-64*1.5,-64*3))),
+        z(4),
+        "dialogue",
+    ])
+}
+
+let nextSignId = 0;
+
 scene("game", ({ levelId, coins }) => {
 	let coinsCollected = 0;
+    nextSignId = 0;
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
@@ -462,9 +492,24 @@ scene("game", ({ levelId, coins }) => {
                 anchor("bot"),
                 pos(),
                 "jumpy", "trampoline", "bounce",
-            ]
+            ],
+            "S": () => [
+                sprite("sign"),
+                area(),
+                body({isStatic: true}),
+                anchor("bot"),
+                pos(),
+                "sign",
+                {
+                    signId: -1,
+                },
+            ],
         },
     });
+    level.get("sign").forEach(sign => {
+        sign.signId = nextSignId;
+        nextSignId++;
+    })
     // add background
     setBackground(rgb(123,193,250));
     // add some starting clouds
@@ -492,6 +537,23 @@ scene("game", ({ levelId, coins }) => {
         makeBlock(door.pos, "doorC");
     });
     //debug.log("level: " + levelId);
+    // signs
+    
+    onCollide("player", "sign", (player, sign) => {
+        if (!talking) {
+            talking = true
+            showDialogue(
+                sign,
+                sign.signId,
+            );
+        }
+    })
+    onCollideEnd("player", "sign", () => {
+        get("dialogue").forEach(destroy);
+        //debug.log("here");
+    })
+    
+
     // Movements
     const upKeyListener = onKeyPress("up", () => {
         if (player1.locked && player1.portal && !player1.dead && !player2.dead) {
@@ -817,5 +879,5 @@ function start(levelId? : number) {
     });
 }
 
-start(1);
+start(0);
 //go("title");
