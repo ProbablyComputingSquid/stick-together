@@ -1,4 +1,4 @@
-import kaplay, { AreaComp, Vec2 } from "kaplay";
+import kaplay, {GameObj, Vec2} from "kaplay";
 import "kaplay/global";
 
 
@@ -13,7 +13,7 @@ kaplay();
 
 const hash = "6641bc2860a8e4ecbf0f1b2dbc3ca6020668cb50";
 
-loadSprite("title-icon","https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png" )
+loadSprite("title-icon", "https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png")
 loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
@@ -60,7 +60,7 @@ Level 7, semitested, works, the jumps are tight, and the final part needs more g
 Level 8, untested, the maze is a bit confusing
 Level 9, untested, the stairs are also a bit confusing
 Level 10, untested, final level, needs to be epic
-*/ 
+*/
 const LEVELS = [
     // test level
     [
@@ -70,7 +70,7 @@ const LEVELS = [
         "                                           ",
         " L              a        c                  ",
         "             $  a        c           =      ",
-        "O@  S  S  U  ^  aA B   C c D    _ ^^^U^^^     > ",
+        "O@  S     U  ^  aA B   C c D    _ ^^^U^^^     > ",
         "====================bb======dddd======================",
     ],
     // tech level -- are these jumps possible?
@@ -84,26 +84,38 @@ const LEVELS = [
     // tutorial
     [
         "                      $$$            =",
-        "=  L               $  ===            =",
-        "=@                 $             >   =",
-        "=O  $  $  $ U^^^^  $   ^  $$$ ^^===^^=",
+        "=  L         $     $  ===            =",
+        "=@          $      $             >   =",
+        "=O  S  S $$$U^^^^  $  ^ $$$ S ^^===^^=",
         "======================================",
     ],
     // the broken bridge
-	[
+    [
         "                             a   == ",
         "                      $$$$   a   ==",
-		"                 $$          a > ==",
-		"       =    ==   ==   =  =   a=====",
-		"L      =                        ===",
-		"   =   =                     $$$===",
-		"O@         ^^   ^^   ^^  ^^  $A$===",
-		"===================================",
-	],
+        "                 $$          a > ==",
+        "       =    ==   ==   =  =   a=====",
+        "L      =                        ===",
+        "   =   =                     $$$===",
+        "O@   S     ^^   ^^   ^^  ^^  $A$===",
+        "===================================",
+    ],
+    // the box
+    [
+        "$$$                     $$$     A            ",
+        "$$$     aaaaa           $$$   bb=bb          ",
+        "===     a   a  bb       $$$          b       ",
+        "=       a > a     bbb  $$^$$            b    ",
+        "=       =====          bb=bb                b",
+        "= L                                          ",
+        "=@                                       b   ",
+        "=O   ^^ $$$$$ ^^ $$ ^^    S U^^^^^           U      B",
+        "==============================================     U=",
+    ],
     // the pit
     [
         "L            ",
-        "O@$$$ ^^^  A",
+        "O@$$$ ^^^ S A",
         "==aaa========",
         "= $$$       =",
         "= $$$       =",
@@ -117,28 +129,16 @@ const LEVELS = [
         "=     b   c>=",
         "=  U  b   ===",
         "=     b =   =",
-        "=^^^^^b    C=",
+        "=^^^^^b S  C=",
         "=============",
-    ],
-    // the box
-    [
-        "$$$                     $$$     A            ",
-		"$$$     aaaaa           $$$   bb=bb          ",
-        "===     a   a  bb       $$$          b       ",
-        "=       a > a     bbb  $$^$$            b    ",
-		"=       =====          bbbbb                b",
-        "= L                                          ",
-		"=@                                       b   ",
-        "=O   ^^ $$$$$ ^^ $$ ^^                 B     ",
-        "==============================================",
     ],
     // jump for it
     [
         "                                             $$$     $         ",
-        "                                            =====              ",
+        "                            a               =====              ",
         " L                          a                                  ",
         "                        ^   a        =   =                  >  ",
-        "O @   $   $     ^       =$$$=A               $$$    ^^^    === ",
+        "O @   $   $     ^       =$$S=A               $$$    ^^^    === ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
     // the high jump
@@ -148,9 +148,9 @@ const LEVELS = [
         "        a            $                      ",
         "        a   U      $ =             >        ",
         "       =a          =     b    b  =====   b  ",
-        "L       a                                   ",
+        "L       a            S                      ",
         "        abbbbbbA  =  =            $$$  b    ",
-        "O @     a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
+        "O @  S  a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
         "=============================================",
     ],
     // boing
@@ -199,7 +199,7 @@ const LEVELS = [
         "   =        a =====                        $$   =",
         "  = A       ==    c            U           $$   =",
         "==  =      ===    c                  $     $$   =",
-        "=    L     ===  > c                  =     $$   =",    
+        "=    L     ===  > c                  =     $$   =",
         "=       ===========                  ==         =",
         "=O@     =$$$$$$$$$---===^^^^^^^^^^^^^===   ^^   =",
         "=================================================",
@@ -229,7 +229,7 @@ for (const level of LEVELS) {
     }
 }
 
-    
+
 function restart(levelId: number, coins: number) {
     play("vine-boom");
     go("game", {
@@ -239,7 +239,7 @@ function restart(levelId: number, coins: number) {
 }
 
 // makeBlock function creates a path block in certain positions
-function makeBlock(position, name) {
+function makeBlock(position: Vec2, name: string) {
     if (name == "pathB") {
         return add([
             sprite("grass"),
@@ -248,7 +248,7 @@ function makeBlock(position, name) {
             pos(position),
             body({isStatic: true}),
             offscreen({hide: true, distance: 64}),
-            "path","pathB","B",
+            "path", "pathB", "B",
         ])
     } else if (name == "pathD") {
         return add([
@@ -258,7 +258,7 @@ function makeBlock(position, name) {
             pos(position),
             body({isStatic: true}),
             offscreen({hide: true, distance: 64}),
-            "path","pathD","D",
+            "path", "pathD", "D",
         ])
     } else if (name == "doorC") {
         return add([
@@ -274,10 +274,10 @@ function makeBlock(position, name) {
 }
 
 function addCloud(cloudPos?) {
-    let zdistance = rand(0,1) * 3 + 1;
+    let zdistance = rand(0, 1) * 3 + 1;
     return add([
         sprite("cloud"),
-        pos(cloudPos || rand(vec2(0,0), vec2(width()/2, height()))),
+        pos(cloudPos || rand(vec2(0, 0), vec2(width() / 2, height()))),
         move(0, 100 / zdistance),
         scale(1 / zdistance),
         //area(),
@@ -289,32 +289,82 @@ function addCloud(cloudPos?) {
 }
 
 onDestroy("cloud", () => {
-    rand(0,1) > 0.6 ? addCloud() : null;
+    rand(0, 1) > 0.6 ? addCloud() : null;
 })
 
-// dialogue 
+
+// IMPORTANT
+// put all dialogue for signs here
+
 const dialogues = [
+    //"debug sign",
     "Welcome to stick together!",
-    "sign 2",
+    "Controls are WASD and arrow keys.",
+    "The end is near!",
+    "Sometimes, you need to split up",
+    "Try holding up to bounce higher",
+    "Mind the edge",
+    "I couldn't outsmart you :(",
+    "Stuck? Try jumping on your friend. I promise, it won't hurt. (as long as you're on top)",
+    "Don't forget your friend!",
+    "I wouldn't want to be the bottom here. I'm always on top",
 ]
+
+
 let talking = false;
-function showDialogue(sign, signID) {
+function measureText(text: string, options: { size: number, width: number }): { width: number, height: number } {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) {
+        throw new Error('Failed to get 2D context');
+    }
+    context.font = `${options.size}px Arial`;
+    const words = text.split(' ');
+    let line = '';
+    let height = options.size;
+    let width = 0;
+
+    for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = context.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > options.width && n > 0) {
+            line = words[n] + ' ';
+            height += options.size;
+        } else {
+            line = testLine;
+            width = Math.max(width, testWidth);
+        }
+    }
+
+    return {
+        width: Math.min(width, options.width),
+        height: height,
+    };
+}
+
+function showDialogue(sign: GameObj<any>, signID: string | number) {
     talking = false;
-    const dialogueBox = add([
-        rect(64*3, 64*2),
-        color(0,0,0),
+    const dialogueText = dialogues[signID];
+    const textSize = measureText(dialogueText, { size: 16, width: 64 * 3 });
+
+    // sign text background
+    add([
+        rect(textSize.width + 64/2, textSize.height + 40),
+        color(0, 0, 0),
         opacity(0.7),
-        pos(sign.pos.sub(vec2(64*1.5,64*3))),
+        pos(sign.pos.sub(vec2((textSize.width + 20) / 2, textSize.height + 64))),
         z(3),
         "dialogue",
-    ])
-    //debug.log(signID);
-    const dialogueText = add([
-        text(dialogues[signID], {size:16, width: 64*3}),
-        pos(sign.pos.add(vec2(-64*1.5,-64*3))),
+    ]);
+
+    // sign text
+    add([
+        text(dialogueText, { size: 16, width: 64 * 3 }),
+        pos(sign.pos.sub(vec2(textSize.width / 2, textSize.height + 40))),
         z(4),
         "dialogue",
-    ])
+    ]);
 }
 
 let nextSignId = 0;
@@ -495,10 +545,11 @@ scene("game", ({ levelId, coins }) => {
             ],
             "S": () => [
                 sprite("sign"),
-                area(),
-                body({isStatic: true}),
+                area({scale:vec2(0.75,0.8)}),
+                //body({isStatic: true}),
                 anchor("bot"),
-                pos(),
+                scale(1.5),
+                pos(vec2(0, 16)),
                 "sign",
                 {
                     signId: -1,
@@ -761,7 +812,7 @@ scene("game", ({ levelId, coins }) => {
     
 
     // Enter the next level on portal
-    const portalHandler = onCollide("player", "portal", (player, portal) => {
+    const portalHandler = onCollide("player", "portal", (player) => {
         play("portal");
         player.portal = true;
         player.locked = true;
@@ -879,5 +930,5 @@ function start(levelId? : number) {
     });
 }
 
-start(0);
+start(1);
 //go("title");
