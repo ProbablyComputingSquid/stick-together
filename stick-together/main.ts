@@ -21,8 +21,8 @@ loadSound("alarm", "/audio/alarm.mp3");
 loadSound("vine-boom", "/audio/vine-boom.mp3");
 loadSound("stick-together", "/audio/music/stick_together.mp3");
 loadSound("stick-together-2", "/audio/music/stick_together_2.mp3");
-loadMusic("stick-together-3", "/audio/music/stick_together_guys.mp3");
-loadMusic("stick-together-4", "audio/music/always_stick_together.mp3");
+loadSound("stick-together-3", "/audio/music/stick_together_guys.mp3");
+loadSound("stick-together-4", "audio/music/always_stick_together.mp3");
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
 loadSprite("coin", "/sprites/coin.png");
@@ -84,8 +84,8 @@ const LEVELS = [
     ],*/
     // tutorial
     [
-        "                      $$$            =",
-        "=  L         $     $  ===            =",
+        "                     $$$             =",
+        "   L         $     $ ===             =",
         "=@          $      $             >   =",
         "=O  S  S $$$U^^^^  $  ^ $$$ S ^^===^^=",
         "======================================",
@@ -94,7 +94,7 @@ const LEVELS = [
     [
         "                             a   == ",
         "                      $$$$   a   ==",
-        "                 $$          a > ==",
+        "                 $$          aS >==",
         "       =    ==   ==   =  =   a=====",
         "L      =                        ===",
         "   =   =                     $$$===",
@@ -103,14 +103,14 @@ const LEVELS = [
     ],
     // the box
     [
-        "$$$                     $$$     A            ",
-        "$$$     aaaaa           $$$   bb=bb          ",
-        "===     a   a  bb       $$$          b       ",
-        "=       a > a     bbb  $$^$$            b    ",
-        "=       =====          bb=bb                b",
-        "= L                                          ",
-        "=@                                       b   ",
-        "=O   ^^ $$$$$ ^^ $$ ^^    S U^^^^^           U      B",
+        "$$$                     $$$         A            ",
+        "$$$     aaaaa           $$$       bb=bb          ",
+        "===     a   a  bb       $$$             b       ",
+        "        a > a     bbb  $$^$$                 b    ",
+        "        =====          bb=bb   $$$$               b",
+        "L                             $    $                ",
+        " @                           $                  b   ",
+        " O   ^^ $$$$$ ^^ $$ ^^    S U^^^^^           U      B",
         "==============================================     U=",
     ],
     // the pit
@@ -131,15 +131,16 @@ const LEVELS = [
         "=     b   c>=",
         "=  U  b   ===",
         "=     b =   =",
-        "=^^^^^b S  C=",
+        "=^^^^^^^S  C=",
         "=============",
     ],
     // jump for it
     [
         "                                             $$$     $         ",
-        "                            a               =====              ",
-        " L                          a                VVV               ",
-        "                        ^   a        =   =    $             >  ",
+        "                                            =====              ",
+        "                            a                VVV               ",
+        " L                          a                 $                ",
+        "                        ^   a        =   =                  >  ",
         "O @   $   $     ^       =$$S=A               $U$    ^^^    === ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
@@ -163,8 +164,8 @@ const LEVELS = [
         "                            $$   =                            D =",
         " $                         ^$$ C =      ==================---====",
         "==                         =======     ==      $     =$$$$$$$$$$=",
-        " $    ======================            =   =======          =",
-        " U      V   V   V   V      =         U  =  U      =  ====----====",
+        " $    ======================            =   =======  =          =",
+        " U      V   V   V   V      =         U  =  U      =  =====---====",
         "                           =            =         =          ac =",
         "==        ^   ^   ^        =   $$$B        S      =          ac>=",
         "      ===============-         =================  ======ddddd====",
@@ -186,22 +187,22 @@ const LEVELS = [
         "   =        a =====                        $$   =",
         "  = A       ==    c            U           $$   =",
         "==  =      ===    c                  $     $$   =",
-        "=    L     ===  > c                  =     $$   =",
-        "=       ===========                  ==         =",
+        "=          ===  > c                  =     $$   =",
+        "=  L    ===========                  ==         =",
         "=O@     =$$$$$$$$$---===^^^^^^^^^^^^^===   ^^   =",
         "=================================================",
     ],
     // I need to find a good name for this level later
     [
         "  L                                                  ",
-        "  O@ S_       _  =    _    ^^^                _      ",
+        "  O@ S_       _  =    _    ^^^            S   _     _",
         "  =====bbbbbbb=====  ===  =====           =$ === $ === $=",
-        "= -                  = =   $$$            =$     $     $=",
-        "  -$                 = =            ^    d=$     $     $=",
-        "  =$$                =$=ddd   dd   d=d    =$     $     $=",
+        "= -                  =$=   $$$            =$     $     $=",
+        "  -$                 =$-            ^    d=$     $     $=",
+        "  =$$                =$-ddd   dd   d=d    =$     $     $=",
         "  =$$$               =$=                  =$     $     $=",
-        "  ==$$$              =$=                  a$   c $ c   $=",
-        "  = =$$$          _  =$-                  a$   ccccc   $=",
+        "  ==$$$              =$U                  a$   c $ c   $=",
+        "  = =$$$          _  =$=                  a$   ccccc   $=",
         "  =  =$$B^^^^^^^^^_  =$-D                 aA     >     C=",
         "  =======================================================",
     ],
@@ -218,7 +219,7 @@ const LEVELS = [
         "=    a                                                 ",
         "=    a                                                 ",
         "=    a                              U                  ",
-        "=  > a                                               D ",
+        "= >  a                                               D ",
         "======                                 U       UUU  ===",
     ],
     // the final level
@@ -226,9 +227,9 @@ const LEVELS = [
         "                                                        aaaaaa=",
         "                                                        accccc=",
         "                                                        ac    =",
-        "                           ^                            ac >  =",
-        "                           =                     bbb=bbb=======",
-        "       S    ^              =                        V         =",
+        "                           ^                            ac S >=",
+        " L                         =                     bbb=bbb=======",
+        " O @    S    ^              =                        V         =",
         "========= $ =   =  =   =====    ======                     C  = ",
         "=       = $ =          VVVVV    =       dU   dddU      U=======   ",
         "=       = $ U                 U =                               ",
@@ -320,9 +321,9 @@ const dialogues = [
     //"debug sign",
     "Welcome to stick together!",
     "Controls are WASD and arrow keys.",
-    "The end is near!",
+    "The end is nigh!",
+    "Beam me up, scotty",
     "Sometimes, you need to split up",
-    //"for some reason this text doesn't show up???",
     "Try holding up to bounce higher",
     "Mind the edge",
     "congrats",
@@ -335,12 +336,14 @@ const dialogues = [
     "A crate could catch your fall",
     "I'll see you on the other side",
     "Crates can trigger buttons too...",
+    "To push, or not to push, tis the question",
     "Try jumping on the sides of the trampoline",
+    "Thanks for playing!",
     "Sometimes, you have to take risks",
 ]
 
 
-let talking = false;
+
 function measureText(text: string, options: { size: number, width: number }): { width: number, height: number } {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -373,7 +376,7 @@ function measureText(text: string, options: { size: number, width: number }): { 
 }
 
 function showDialogue(sign: any, signID: string | number) {
-    talking = false;
+
     const dialogueText = dialogues[signID];
     const textSize = measureText(dialogueText, { size: 16, width: 64 * 3 });
 
@@ -385,6 +388,9 @@ function showDialogue(sign: any, signID: string | number) {
         pos(sign.pos.sub(vec2((textSize.width + 20) / 2, textSize.height + 64))),
         z(3),
         "dialogue",
+        {
+            ID : signID
+        }
     ]);
 
     // sign text
@@ -393,14 +399,17 @@ function showDialogue(sign: any, signID: string | number) {
         pos(sign.pos.sub(vec2(textSize.width / 2, textSize.height + 40))),
         z(4),
         "dialogue",
+        {
+            ID : signID
+        }
     ]);
 }
 
-let nextSignId = 0;
-
+let nextsignID = 0;
+let levelMusic;
 scene("game", ({ levelId, coins }) => {
 	let coinsCollected = 0;
-    //nextSignId = 0;
+
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
@@ -581,15 +590,16 @@ scene("game", ({ levelId, coins }) => {
                 pos(vec2(0, 16)),
                 "sign",
                 {
-                    signId: -1,
+                    signID: -1,
+                    isBeingRead: false,
                 },
             ],
         },
     });
     let levelSigns = 0;
     level.get("sign").forEach(sign => {
-        sign.signId = nextSignId;
-        nextSignId++;
+        sign.signID = nextsignID;
+        nextsignID++;
         levelSigns++;
     })
     // add background
@@ -607,13 +617,15 @@ scene("game", ({ levelId, coins }) => {
     const player1 = level.get("player1")[0];
     const player2 = level.get("player2")[0];
 
-    let levelMusic;
-    if (levelId < 5) {
+
+    if (levelId == 1) {
         levelMusic = play("stick-together-2", {loop:true});
-    } else if (levelId < 10) {
+    } else if (levelId == 4) {
+        levelMusic.stop();
+        levelMusic = play("stick-together-4", {loop:true});
+    } else if (levelId == 8) {
+        levelMusic.stop();
         levelMusic = play("stick-together-3", {loop:true});
-    } else {
-        play("stick-together-4", {loop:true});
     }
     
     // spawn doors in
@@ -623,18 +635,23 @@ scene("game", ({ levelId, coins }) => {
 
 
     // signs
-    
+
     onCollide("player", "sign", (player, sign) => {
-        if (!talking) {
-            talking = true
+        if (!sign.isBeingRead) {
+            sign.isBeingRead = true;
             showDialogue(
                 sign,
-                sign.signId,
+                sign.signID,
             );
         }
     })
-    onCollideEnd("player", "sign", () => {
-        get("dialogue").forEach(destroy);
+    onCollideEnd("player", "sign", (player, sign) => {
+        sign.isBeingRead = false;
+        get("dialogue").forEach((dialogue) => {
+            if (dialogue.ID == sign.signID) {
+                dialogue.destroy();
+            }
+        });
     })
     
 
@@ -763,7 +780,7 @@ scene("game", ({ levelId, coins }) => {
                 player2.dead = true; player2.locked = true;
                 play("vine-boom");
                 wait(2, () => {
-                    go("lose");
+                    restart(levelId, coins);
                 })
             }
         })
@@ -780,8 +797,8 @@ scene("game", ({ levelId, coins }) => {
             wait(0.1, () => {
                 if (touchingSpikes) {
                     touchingSpikes = false;
-                    levelMusic.stop();
-                    nextSignId -= levelSigns;
+                    //levelMusic.stop();
+                    nextsignID -= levelSigns;
                     restart(levelId, coins);
                 }
             })
@@ -833,8 +850,8 @@ scene("game", ({ levelId, coins }) => {
     // Fall death
     const playerOnUpdate = onUpdate(() => {
         if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
-            levelMusic.stop();
-            nextSignId -= levelSigns;
+            //levelMusic.stop();
+            nextsignID -= levelSigns;
             debug.log("You fell to your death!");
             restart(levelId, coins)
         }
@@ -899,20 +916,10 @@ scene("game", ({ levelId, coins }) => {
         portalHandler.cancel();
         jumpyListener.cancel();
         jumpy2Listener.cancel();
-        levelMusic.stop();
         level.get("cloud").forEach(destroy);
     }
 });
-scene("lose", () => {
-    add([
-        text("You lost!"),
-        scale(3),
-        outline(12, BLACK),
-        anchor("center"),
-        pos(center()),
-    ]);
-    onKeyPress(() => {start()});
-})
+
 scene("win", ({ coins }) => {
     const winText = add([
         text(`You won!\nYou grabbed ${coins} out of ${totalCoins} coins!!!`, {
@@ -973,7 +980,17 @@ scene("title", () => {
     })
     //title_music.paused = false;
 })
-
+scene("load", () => {
+    setBackground(BLACK);
+    add([
+        text("click to start"),
+        pos(center()),
+        color(WHITE),
+    ]);
+    onClick(() => {
+        go("title")
+    })
+})
 function start(levelId? : number) {
     go("game", {
         levelId: levelId == null ? 1 : levelId,
@@ -981,5 +998,5 @@ function start(levelId? : number) {
     });
 }
 
-//start(10);
-go("title");
+//start(5);
+go("load");
