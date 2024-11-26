@@ -71,7 +71,7 @@ const LEVELS = [
         " L              a        c                  ",
         "             $  a        c           =      ",
         "O@  S     U  ^  aA B   C c D    _ ^^^U^^^     > ",
-        "====================bb======dddd======================",
+        "====================bb======dddd================",
     ],
     // tech level -- are these jumps possible?
     /*[
@@ -119,6 +119,7 @@ const LEVELS = [
         "==aaa========",
         "= $$$       =",
         "= $$$       =",
+        "= $$$       =",
         "= $$$    $  =",
         "= $ $    $  =",
         "= ^^^    $  =",
@@ -136,9 +137,9 @@ const LEVELS = [
     [
         "                                             $$$     $         ",
         "                            a               =====              ",
-        " L                          a                                  ",
-        "                        ^   a        =   =                  >  ",
-        "O @   $   $     ^       =$$S=A               $$$    ^^^    === ",
+        " L                          a                VVV               ",
+        "                        ^   a        =   =    $             >  ",
+        "O @   $   $     ^       =$$S=A               $U$    ^^^    === ",
         "===  ===  =   =====   =========    =   =    ===================",
     ],
     // the high jump
@@ -153,44 +154,29 @@ const LEVELS = [
         "O @  S  a^^^^^^=^^^^^=^^^^^^^^^^^ $$$ ^^^^^^",
         "=============================================",
     ],
-    // boing
-    [
-        "                                                       ",
-        "  L                                                  a ",
-        "  @ O                        ===       U    =ddddddd===",
-        "======   $     $     $  ^  $ VVV $                     ",
-        "=    a   $     $     $  =  $     $  U                  ",
-        "=    a   $     $ ^^^ $     $     $                     ",
-        "=    a   $     $ === $     $     $                     ",
-        "=    a   U     U     U     U     U                     ",
-        "=    a                                                 ",
-        "=    a                                                 ",
-        "=    a                              U                  ",
-        "=  > a                                               D ",
-        "======                                 U       UUU  ===",
-    ],
     // aMAZEng
+    // this level is laggy
     [
-        "                                 ^                             =",
-        "                                 =                           $ =",
-        "                            $$   =                           D =",
-        " $    ==================   ^$$ C =     ==================---====",
-        "==                  $$$=   =======    ==  V   $     =$$$$$$$$$$=",
-        " $    ======================     ===   =     =====  =          =",
-        "        V   V   V   V      =           =  U      =  ====----====",
-        "                           =           =         =          ac =",
-        "==        ^   ^   ^        =  $$$                =          ac>=",
-        "      ===============-     =  =================  ======ddddd====",
-        "L    =               -                        =                =",
-        "O @            ^^^$$$-           $$       $$$^=      $ $ $ $ A =",
-        "================================================================",
+        "                                 ^                              =",
+        "                                 =                            $ =",
+        "                            $$   =                            D =",
+        " $                         ^$$ C =      ==================---====",
+        "==                         =======     ==      $     =$$$$$$$$$$=",
+        " $    ======================            =   =======          =",
+        " U      V   V   V   V      =         U  =  U      =  ====----====",
+        "                           =            =         =          ac =",
+        "==        ^   ^   ^        =   $$$B        S      =          ac>=",
+        "      ===============-         =================  ======ddddd====",
+        "L    =               -        b                U                =",
+        "O@ S        S  ^^^$$$-            $$       $$$^=      $ $ $ $  A=",
+        "========================    ===   ==   =   =======   == = = =  ==",
     ],
     // the stairs
     [
         "                                =================",
         "            =====================               -        $$$$",
         "           =                                    -        $$$$",
-        "          =               _    _    ^         C -        $$$$",
+        "          =              S_    _    ^         CS-        $$$$",
         "         =               ==   ===  ===    =$$====        ====",
         "        =            B  =                  $$   =        ",
         "       =            ^=^^=                  $$   =    U",
@@ -207,7 +193,7 @@ const LEVELS = [
     // I need to find a good name for this level later
     [
         "  L                                                  ",
-        "  O@  _       _  =    _    ^^^                _      ",
+        "  O@ S_       _  =    _    ^^^                _      ",
         "  =====bbbbbbb=====  ===  =====           =$ === $ === $=",
         "= -                  = =   $$$            =$     $     $=",
         "  -$                 = =            ^    d=$     $     $=",
@@ -217,6 +203,39 @@ const LEVELS = [
         "  = =$$$          _  =$-                  a$   ccccc   $=",
         "  =  =$$B^^^^^^^^^_  =$-D                 aA     >     C=",
         "  =======================================================",
+    ],
+     // boing
+     [
+        "                                                       ",
+        "  L                                                  A ",
+        "@ O S                        ===       U    =ddddddd===",
+        "======   $     $     $  ^  $ VVV $                     ",
+        "=    a   $     $     $  =  $     $  U                  ",
+        "=    a   $     $ ^^^ $     $     $                     ",
+        "=    a   $     $ === $     $     $                     ",
+        "=    a   U     U     U     U     U                     ",
+        "=    a                                                 ",
+        "=    a                                                 ",
+        "=    a                              U                  ",
+        "=  > a                                               D ",
+        "======                                 U       UUU  ===",
+    ],
+    // the final level
+    [
+        "                                                        aaaaaa=",
+        "                                                        accccc=",
+        "                                                        ac    =",
+        "                           ^                            ac >  =",
+        "                           =                     bbb=bbb=======",
+        "       S    ^              =                        V         =",
+        "========= $ =   =  =   =====    ======                     C  = ",
+        "=       = $ =          VVVVV    =       dU   dddU      U=======   ",
+        "=       = $ U                 U =                               ",
+        "=   A   = $ =            B      =DU^^^                        ",
+        "U   =   U $ U            =      ======U                           ",
+        "                       U   U    =                              ",
+        "        =   =                   =                              ",
+        "                                =                              ",
     ],
 ]
 
@@ -302,12 +321,21 @@ const dialogues = [
     "Controls are WASD and arrow keys.",
     "The end is near!",
     "Sometimes, you need to split up",
+    //"for some reason this text doesn't show up???",
     "Try holding up to bounce higher",
     "Mind the edge",
-    "I couldn't outsmart you :(",
-    "Stuck? Try jumping on your friend. I promise, it won't hurt. (as long as you're on top)",
+    "congrats",
+    "Stuck? Try jumping with your friend. I promise, it won't hurt. (as long as you're on top)",
     "Don't forget your friend!",
-    "I wouldn't want to be the bottom here. I'm always on top",
+    "I would send someone to scout out the area, but I'm a sign. Who am I to tell you things?",
+    "Watch the spikes",
+    "This maze isn't as hard as the labyrinth",
+    "try going around the back",
+    "A crate could catch your fall",
+    "I'll see you on the other side",
+    "Crates can trigger buttons too...",
+    "Try jumping on the sides of the trampoline",
+    "Sometimes, you have to take risks",
 ]
 
 
@@ -371,7 +399,7 @@ let nextSignId = 0;
 
 scene("game", ({ levelId, coins }) => {
 	let coinsCollected = 0;
-    nextSignId = 0;
+    //nextSignId = 0;
     const level = addLevel(LEVELS[levelId || 0], {
         tileWidth: 64,
         tileHeight: 64,
@@ -557,9 +585,11 @@ scene("game", ({ levelId, coins }) => {
             ],
         },
     });
+    let levelSigns = 0;
     level.get("sign").forEach(sign => {
         sign.signId = nextSignId;
         nextSignId++;
+        levelSigns++;
     })
     // add background
     setBackground(rgb(123,193,250));
@@ -581,6 +611,8 @@ scene("game", ({ levelId, coins }) => {
         levelMusic = play("stick-together-2", {loop:true});
     } else if (levelId < 10) {
         levelMusic = play("stick-together-3", {loop:true});
+    } else {
+        play("stick-together-4", {loop:true});
     }
     
     // spawn doors in
@@ -748,6 +780,7 @@ scene("game", ({ levelId, coins }) => {
                 if (touchingSpikes) {
                     touchingSpikes = false;
                     levelMusic.stop();
+                    nextSignId -= levelSigns;
                     restart(levelId, coins);
                 }
             })
@@ -801,6 +834,8 @@ scene("game", ({ levelId, coins }) => {
     const playerOnUpdate = onUpdate(() => {
         if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
             levelMusic.stop();
+            nextSignId -= levelSigns;
+            debug.log("You fell to your death!");
             restart(levelId, coins)
         }
         if (player1.locked) {
@@ -817,7 +852,7 @@ scene("game", ({ levelId, coins }) => {
         player.portal = true;
         player.locked = true;
         player.opacity = 0;
-        player.area.scale = 0.1;
+        player.area.scale = 0.3;
         if (player1.portal && player2.portal) {
             // clean up level objects
             cleanup();
@@ -930,5 +965,5 @@ function start(levelId? : number) {
     });
 }
 
-start(1);
-//go("title");
+//start(10);
+go("title");
