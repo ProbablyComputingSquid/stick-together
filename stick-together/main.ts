@@ -1,4 +1,4 @@
-import kaplay, {GameObj, Vec2} from "kaplay";
+import kaplay from "kaplay";
 import "kaplay/global";
 
 
@@ -13,8 +13,16 @@ kaplay();
 
 const hash = "6641bc2860a8e4ecbf0f1b2dbc3ca6020668cb50";
 
-loadSprite("title-icon", "https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png")
-loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/")
+loadSprite("title-icon", "https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/7a1d9ebac8a7087721f12b9f17e17793c2ad46c8/stick-together-logo-final.png");
+loadRoot("https://raw.githubusercontent.com/ProbablyComputingSquid/stick-together/" + hash + "/stick-together/public/");
+loadSound("coins", "/audio/coin.mp3");
+loadSound("portal", "/audio/portal.mp3");
+loadSound("alarm", "/audio/alarm.mp3");
+loadSound("vine-boom", "/audio/vine-boom.mp3");
+loadSound("stick-together", "/audio/music/stick_together.mp3");
+loadSound("stick-together-2", "/audio/music/stick_together_2.mp3");
+loadMusic("stick-together-3", "/audio/music/stick_together_guys.mp3");
+loadMusic("stick-together-4", "audio/music/always_stick_together.mp3");
 loadSprite("bean", "/sprites/bean.png");
 loadSprite("bean2", "/sprites/bean2-alt.png");
 loadSprite("coin", "/sprites/coin.png");
@@ -33,14 +41,7 @@ loadSprite("buttonD", "/sprites/buttonD.png");
 loadSprite("jumpy", "/sprites/jumpy.png");
 loadSprite("cloud", "/sprites/cloud.png");
 loadSprite("sign", "sprites/sign.png");
-loadSound("coins", "/audio/coin.mp3");
-loadSound("portal", "/audio/portal.mp3");
-loadSound("alarm", "/audio/alarm.mp3");
-loadSound("vine-boom", "/audio/vine-boom.mp3");
-loadSound("stick-together", "/audio/music/stick_together.mp3");
-loadSound("stick-together-2", "/audio/music/stick_together_2.mp3");
-loadMusic("stick-together-3", "/audio/music/stick_together_guys.mp3");
-loadMusic("stick-together-4", "audio/music/always_stick_together.mp3")
+
 
 
 setGravity(1600);
@@ -258,7 +259,7 @@ function restart(levelId: number, coins: number) {
 }
 
 // makeBlock function creates a path block in certain positions
-function makeBlock(position: Vec2, name: string) {
+function makeBlock(position: any, name: string) {
     if (name == "pathB") {
         return add([
             sprite("grass"),
@@ -371,7 +372,7 @@ function measureText(text: string, options: { size: number, width: number }): { 
     };
 }
 
-function showDialogue(sign: GameObj<any>, signID: string | number) {
+function showDialogue(sign: any, signID: string | number) {
     talking = false;
     const dialogueText = dialogues[signID];
     const textSize = measureText(dialogueText, { size: 16, width: 64 * 3 });
@@ -929,8 +930,9 @@ scene("win", ({ coins }) => {
     });
 });
 scene("title", () => {
+
     const title_music = play("stick-together", {loop:true});
-    title_music.play();
+
     const title_icon = add([
         sprite("title-icon"),
         pos(center().x, center().y - 100),
@@ -969,6 +971,7 @@ scene("title", () => {
         let cloudPos = rand(vec2(-width()/2,-height()/2), vec2(width()/2, height()/2));
         addCloud(cloudPos);
     })
+    //title_music.paused = false;
 })
 
 function start(levelId? : number) {
