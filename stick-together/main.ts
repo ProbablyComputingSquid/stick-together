@@ -619,7 +619,8 @@ scene("game", ({ levelId, coins }) => {
     level.get("doorCPosition").forEach(door => {
         makeBlock(door.pos, "doorC");
     });
-    //debug.log("level: " + levelId);
+
+
     // signs
     
     onCollide("player", "sign", (player, sign) => {
@@ -633,7 +634,6 @@ scene("game", ({ levelId, coins }) => {
     })
     onCollideEnd("player", "sign", () => {
         get("dialogue").forEach(destroy);
-        //debug.log("here");
     })
     
 
@@ -734,7 +734,7 @@ scene("game", ({ levelId, coins }) => {
     
     const playerExitScreenListener = player2.onExitScreen(() => {
         player2InViewport = false;
-        //debug.log("Player 2 left the screen");
+
         const warnText = add([
             text("Stick together!"),
             pos(center().x, center().y - 50),
@@ -812,7 +812,6 @@ scene("game", ({ levelId, coins }) => {
     const buttonDListener = onCollide( "buttonD","triggers button", (button) => {
         destroy(button);
         level.get("pathDPosition").forEach(path => {
-            debug.log("here!");
             makeBlock(path.pos, "pathD")
         });
     })
@@ -939,6 +938,7 @@ scene("title", () => {
         scale(0.5),
     ])
 
+
     const space_text = add([
         text("Press space to start"),
         pos(center().x, center().y + 100),
@@ -953,9 +953,22 @@ scene("title", () => {
     onKeyPress("space", async () => {
         destroy(space_text);
         title_music.stop();
+        cloudLoop.cancel();
         await tween(title_icon.scale, vec2(0), 0.5, (p) => title_icon.scale = p, easings.easeOutBounce);
         start();
     });
+
+    // add background
+    setBackground(rgb(123,193,250));
+    // add some starting clouds
+    for (let i = 0; i < 10; i++) {
+        addCloud();
+    }
+    // spawn a cloud every three seconds
+    const cloudLoop = loop(3, () => {
+        let cloudPos = rand(vec2(-width()/2,-height()/2), vec2(width()/2, height()/2));
+        addCloud(cloudPos);
+    })
 })
 
 function start(levelId? : number) {
