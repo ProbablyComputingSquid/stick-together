@@ -999,4 +999,5 @@ function start(levelId? : number) {
 }
 
 //start(4);
+
 go("load");
