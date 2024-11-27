@@ -37,3 +37,11 @@ This short script readies the production build, avaliable at index.html
 npm run dev
 ```
 visit index.html and live changes will be displayed. 
+
+
+# Credits
+
+* many thanks to the folks at kaplay for maintaining this project
+* huge thanks to hack club for encouraging me to spend 24 hours on this
+* eleven thanks to the joshco server for keeping me sane and debugging
+* special thanks to neophrene, thomas, coolschnoodle, nmduncan, elaborate.eggnog, and my brother for playtesting and debugging 

@@ -621,10 +621,10 @@ scene("game", ({ levelId, coins }) => {
     if (levelId == 1) {
         levelMusic = play("stick-together-2", {loop:true});
     } else if (levelId == 4) {
-        levelMusic.stop();
+        if (levelMusic != undefined) levelMusic.stop();
         levelMusic = play("stick-together-4", {loop:true});
     } else if (levelId == 8) {
-        levelMusic.stop();
+        if (levelMusic != undefined) levelMusic.stop();
         levelMusic = play("stick-together-3", {loop:true});
     }
     
@@ -849,7 +849,7 @@ scene("game", ({ levelId, coins }) => {
 
     // Fall death
     const playerOnUpdate = onUpdate(() => {
-        if (player1.pos.y >= 1000 || player2.pos.y >= 1000) {
+        if (player1.pos.y >= 1200 || player2.pos.y >= 1200) {
             //levelMusic.stop();
             nextsignID -= levelSigns;
             debug.log("You fell to your death!");
@@ -998,5 +998,5 @@ function start(levelId? : number) {
     });
 }
 
-//start(5);
-go("load");
+start(4);
+//go("load");
